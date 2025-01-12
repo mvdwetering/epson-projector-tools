@@ -235,9 +235,10 @@ class EscVp21Server(socketserver.TCPServer):
                 f"--- Each connection will be disconnected after sending {disconnect_after_sending_num_commands} commands!"
             )
 
-        # Add some basic data as supported by EH-TW3200
+        # Add some data as supported by EH-TW3200
+        # Note that on a real device only PWR, SNO and LAMP can be read when in STANDBY, others return ERR
 
-        # TODO: PWR command set has values ON/OFF which is different from GET.
+        # TODO: PWR command SET has values ON/OFF which is different from GET and is currently not supported
         self.store.add_data("PWR", "01")  # Lamp ON
         self.store.add_data("ASPECT", "00")  # Normal
         self.store.add_data("LUMINANCE", "00")
