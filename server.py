@@ -273,6 +273,9 @@ class EscVp21Server(socketserver.TCPServer):
         self.store.add_data("SPEED", "00")  # 9600bps, wow really... you can change the speed?
         # TODO: LAMP is GET only
         self.store.add_data("LAMP", "1234")
+        # SNO is undocumented, but returns a serial number. Obviously GET only
+        self.store.add_data("SNO", "NPCF1Y0202L")
+
 
 
 def main(args):
