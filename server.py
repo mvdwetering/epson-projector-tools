@@ -240,6 +240,7 @@ class EscVp21Server(socketserver.TCPServer):
 
         # TODO: PWR command SET has values ON/OFF which is different from GET and is currently not supported
         self.store.add_data("PWR", "01")  # Lamp ON
+        # TODO: KEY is SET only, skipped for now
         self.store.add_data("ASPECT", "00")  # Normal
         self.store.add_data("LUMINANCE", "00")
         self.store.add_data("SOURCE", "30")  # HDMI1
