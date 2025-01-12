@@ -86,7 +86,7 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
         self._commands_sent = 0
         super().__init__(request, client_address, server)
 
-    def _write_line(self, line: str):
+    def _write_response(self, line: str):
         print(f"Send - {line}")
         line += "\r"
         self.wfile.write(line.encode("utf-8"))
@@ -99,11 +99,11 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
 
     def _send_value(self, command, value):
         """Just formats and send the value"""
-        self._write_line(f"{command}={value}")
+        self._write_response(f"{command}={value}")
 
     def _send_error(self):
         """Just formats and send the value"""
-        self._write_line("ERR")
+        self._write_response("ERR")
 
 
     def handle_get(self, command):
