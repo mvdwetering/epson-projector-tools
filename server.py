@@ -21,6 +21,9 @@ import re
 import socketserver
 from typing import Dict, Tuple
 
+from ir_codes import IR_CODES
+from key_codes import KEY_CODES
+
 @dataclass
 class EscVp21Command:
     command: str
@@ -136,6 +139,19 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
                 value = "01"  # Lamp ON
             elif value == "OFF":
                 value = "00"  # Standby Mode (Network OFF)
+
+        if command == "KEY":
+            key_name = KEY_CODES.get(value, None)
+            ir_name = IR_CODES.get(value, None)
+            if key_name is None and ir_name is None:
+                print(f"Unknown value for KEY and IR: {value}")
+            elif key_name is not None and ir_name is not None:
+                print(f"Duplicate mapping? KEY CODE = {key_name} and IR CODE = {ir_name}")
+            elif key_name is not None:
+                print(f"KEY CODE = {key_name}")
+            elif ir_name is not None:
+                print(f"IR CODE = {ir_name}")
+            value = None
 
         # Store new value, will check for valid commands
         if not self.store.set_data(command, value):
