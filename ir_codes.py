@@ -1,7 +1,7 @@
 
 
 # Some ir codes
-IR_CODES = {
+IR_CODES:dict[str, str] = {
     "3B": "Power",
     "A1": "Power ON",
     "6C": "Power OFF",
@@ -74,7 +74,7 @@ IR_CODES = {
     "77": "7(10 Key)",
     "78": "8(10 Key)",
     "79": "9(10 Key)",
-    "7A": "．(10 Key)",
+    "7A": ". (10 Key)",
     "6D": "Source(OEM)",
     "6F": "Quick Setup or Screen Fit",
     "7B": "Keystone +",

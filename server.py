@@ -57,7 +57,7 @@ class EscVp21DataStore:
             return None
         return value
 
-    def set_data(self, command, new_value) -> bool:
+    def set_data(self, command:str, new_value:str|None) -> bool:
         """Write new value, returns True if value was stored, False if not"""
         if command in self._store:
             if new_value is not None:
@@ -119,7 +119,7 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
             self._send_value(command, value)
         self._write_colon()
 
-    def handle_set(self, command, value):
+    def handle_set(self, command:str, new_value:str):
 
         if value == "INC" or value == "DEC":
             # TODO: Range checking
@@ -189,7 +189,7 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
             bytes_line = bytes_line.strip()
             line = bytes_line.decode(
                 "utf-8"
-            )  # Not sure if it is UTF-8, bue lets assume...
+            )  # Not sure if it is UTF-8, but lets assume...
             print(f"Recv - {line}")
 
             # Empty command is called "null command". Can be used to check if is projector is operational
@@ -307,7 +307,7 @@ def main(args):
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
 
-        print("--- Waiting for connections")
+        print(f"--- Waiting for connections on port {args.port}")
 
         server.timeout = None
         server.serve_forever()

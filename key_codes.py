@@ -1,7 +1,7 @@
 
 
 # Some keycodes have multiple meanings, those are both mentioned with "or" inbetween
-KEY_CODES = {
+KEY_CODES:dict[str, str] = {
     "02": "Standby",
     "03": "Menu",
     "04": "Help",
