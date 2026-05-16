@@ -20,6 +20,7 @@ import logging
 import re
 import socketserver
 from typing import Dict, Tuple
+import time
 
 from ir_codes import IR_CODES
 from key_codes import KEY_CODES
@@ -92,20 +93,16 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
     def _write_response(self, line: str):
         print(f"Send - {line}")
         line += "\r"
+        line += ":"
         self.wfile.write(line.encode("utf-8"))
         self._commands_sent += 1
-
-    def _write_colon(self):
-        print("Send - :")
-        self.wfile.write(":".encode("utf-8"))
-        self.wfile.flush()
 
     def _send_value(self, command, value):
         """Just formats and send the value"""
         self._write_response(f"{command}={value}")
 
     def _send_error(self):
-        """Just formats and send the value"""
+        """Send error response"""
         self._write_response("ERR")
 
 
@@ -117,30 +114,37 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
             self._send_error()
         else:
             self._send_value(command, value)
-        self._write_colon()
 
     def handle_set(self, command:str, new_value:str):
+        value:str|None = new_value
+
+        # Quick hack, INIT is a special value and should not get stored
+        if value == "INIT":
+            value = None
 
         if value == "INC" or value == "DEC":
             # TODO: Range checking
             amount = 1 if value == "INC" else -1
 
             # Assumption is all inc/dec commands are integers
-            value = int(self.store.get_data(command))
-            value = str(value + amount)
+            data = self.store.get_data(command)
+            if data is not None:
+                int_value = int()
+                value = str(int_value + amount)
+            else:
+                logging.error(f"INC/DEC command for {command} is not supported, because no data stored for it")
 
-        # Quick hack, INIT is a special value and should not get stored
-        if value == "INIT":
-            value = None
 
         if command == "PWR":
             # TODO: Should be extended to emulate power states
+            print(">> Sleep for 10 seconds to emulate slow power state change")
+            time.sleep(10)
             if value == "ON":
                 value = "01"  # Lamp ON
             elif value == "OFF":
                 value = "00"  # Standby Mode (Network OFF)
 
-        if command == "KEY":
+        elif command == "KEY" and value is not None:
             key_name = KEY_CODES.get(value, None)
             ir_name = IR_CODES.get(value, None)
             if key_name is None and ir_name is None:
@@ -156,7 +160,6 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
         # Store new value, will check for valid commands
         if not self.store.set_data(command, value):
             self._send_error()
-        self._write_colon()
 
     def handle(self):
         # self.rfile is a file-like object created by the handler;
@@ -194,11 +197,14 @@ class EscpVp21CommandHandler(socketserver.StreamRequestHandler):
 
             # Empty command is called "null command". Can be used to check if is projector is operational
             if line == "":
-                self._write_colon()
+                self._write_response("")
                 continue
 
             command = line_to_command(line)
-            if command is not None:
+            if command is None:
+                logging.info(f"Received unknown command: {line}")
+                self._send_error()
+            else:
                 if command.value is None:
                     self.handle_get(command.command)
                 else:
