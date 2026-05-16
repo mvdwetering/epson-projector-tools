@@ -1,0 +1,191 @@
+name: EH-TW3200
+
+commands:
+  # Power — SET accepts ON/OFF, stored/returned as 01/00
+  PWR:
+    default: "01"
+    readable: true
+    writable: true
+    set_map:
+      "ON": "01"
+      "OFF": "00"
+
+  # Input source
+  SOURCE:
+    default: "30"
+    readable: true
+    writable: true
+
+  # Picture geometry / image adjustment
+  ASPECT:
+    default: "00"
+    readable: true
+    writable: true
+
+  LUMINANCE:
+    default: "00"
+    readable: true
+    writable: true
+
+  BRIGHT:
+    default: "11"
+    readable: true
+    writable: true
+    inc_dec: true
+    range: [0, 255]
+
+  CONTRAST:
+    default: "22"
+    readable: true
+    writable: true
+    inc_dec: true
+    range: [0, 255]
+
+  TINT:
+    default: "33"
+    readable: true
+    writable: true
+    inc_dec: true
+    range: [0, 255]
+
+  SHARP:
+    default: "44"
+    readable: true
+    writable: true
+    inc_dec: true
+    range: [0, 255]
+
+  CTEMP:
+    default: "55"
+    readable: true
+    writable: true
+
+  FCOLOR:
+    default: "66"
+    readable: true
+    writable: true
+
+  CMODE:
+    default: "15"
+    readable: true
+    writable: true
+
+  HPOS:
+    default: "77"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  VPOS:
+    default: "88"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  TRACKIOK:
+    default: "99"
+    readable: true
+    writable: true
+
+  SYNC:
+    default: "111"
+    readable: true
+    writable: true
+
+  # RGB offset / gain
+  OFFSETR:
+    default: "122"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  OFFSETG:
+    default: "133"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  OFFSETB:
+    default: "144"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  GAINR:
+    default: "155"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  GAING:
+    default: "166"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  GAINB:
+    default: "177"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  GAMMALV:
+    default: "188"
+    readable: true
+    writable: true
+    inc_dec: true
+
+  # Colour selection — GET only
+  CSEL:
+    default: "07"
+    readable: true
+    writable: false
+
+  # Mute and image flip
+  MUTE:
+    default: "OFF"
+    readable: true
+    writable: true
+    set_values: ["ON", "OFF"]
+
+  HREVERSE:
+    default: "OFF"
+    readable: true
+    writable: true
+    set_values: ["ON", "OFF"]
+
+  VREVERSE:
+    default: "OFF"
+    readable: true
+    writable: true
+    set_values: ["ON", "OFF"]
+
+  MSEL:
+    default: "00"
+    readable: true
+    writable: true
+
+  # Serial speed
+  SPEED:
+    default: "00"
+    readable: true
+    writable: true
+
+  # Lamp hours — GET only
+  LAMP:
+    default: "1234"
+    readable: true
+    writable: false
+
+  # Serial number — GET only (undocumented)
+  SNO:
+    default: "NPCF1Y0202L"
+    readable: true
+    writable: false
+
+  # Remote key / IR code — SET only, not stored
+  KEY:
+    default: ""
+    readable: false
+    writable: true
+    notify_only: true

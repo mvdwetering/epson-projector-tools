@@ -1,0 +1,101 @@
+from __future__ import annotations
+
+import re
+
+from projector.model import ModelDef
+from projector.state import ProjectorState
+
+# Matches "CMD value" (SET) or "CMD?" (GET)
+_SET_RE = re.compile(r"^(?P<cmd>[A-Za-z0-9]+) (?P<val>.*)$")
+_GET_RE = re.compile(r"^(?P<cmd>[A-Za-z0-9]+)\?$")
+
+_OK = "\r:"
+_ERR = "ERR\r:"
+
+
+def handle_command(state: ProjectorState, model: ModelDef, cmd_str: str) -> str:
+    """
+    Process a single ESC/VP21 command string and return the response.
+
+    This is a pure function: it mutates `state` but performs no I/O.
+    Response format:
+      - GET success : "CMD=value\\r:"
+      - SET / null  : "\\r:"
+      - Error       : "ERR\\r:"
+    """
+    line = cmd_str.strip()
+
+    # Null command — heartbeat / keepalive
+    if not line:
+        return _OK
+
+    # Try GET
+    m = _GET_RE.match(line)
+    if m:
+        return _handle_get(state, model, m.group("cmd"))
+
+    # Try SET
+    m = _SET_RE.match(line)
+    if m:
+        return _handle_set(state, model, m.group("cmd"), m.group("val"))
+
+    return _ERR
+
+
+# ------------------------------------------------------------------
+# Internal helpers
+# ------------------------------------------------------------------
+
+def _handle_get(state: ProjectorState, model: ModelDef, cmd: str) -> str:
+    cmd_def = model.commands.get(cmd)
+    if cmd_def is None or not cmd_def.readable:
+        return _ERR
+    value = state.get(cmd)
+    if value is None:
+        return _ERR
+    return f"{cmd}={value}\r:"
+
+
+def _handle_set(state: ProjectorState, model: ModelDef, cmd: str, value: str) -> str:
+    cmd_def = model.commands.get(cmd)
+    if cmd_def is None or not cmd_def.writable:
+        return _ERR
+
+    # INIT is accepted on any writable command but makes no state change
+    if value == "INIT":
+        return _OK
+
+    # INC / DEC on numeric commands
+    if value in ("INC", "DEC"):
+        if not cmd_def.inc_dec:
+            return _ERR
+        current = state.get(cmd)
+        if current is None:
+            return _ERR
+        try:
+            int_val = int(current)
+        except ValueError:
+            return _ERR
+        delta = 1 if value == "INC" else -1
+        new_val = int_val + delta
+        if cmd_def.range is not None:
+            new_val = max(cmd_def.range[0], min(cmd_def.range[1], new_val))
+        state.set(cmd, str(new_val))
+        return _OK
+
+    # notify_only commands (e.g. KEY): acknowledge but don't store
+    if cmd_def.notify_only:
+        return _OK
+
+    # Apply set_map if defined (e.g. PWR: ON→"01", OFF→"00")
+    if cmd_def.set_map is not None:
+        if value not in cmd_def.set_map:
+            return _ERR
+        value = cmd_def.set_map[value]
+    elif cmd_def.set_values is not None:
+        if value not in cmd_def.set_values:
+            return _ERR
+
+    if not state.set(cmd, value):
+        return _ERR
+    return _OK
