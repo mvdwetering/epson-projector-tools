@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: YAML model file format
 Each model SHALL be defined in a YAML file under `models/` with the following structure:
@@ -19,20 +19,6 @@ Each model SHALL be defined in a YAML file under `models/` with the following st
 #### Scenario: Invalid model file
 - **WHEN** a YAML file is missing required fields or has invalid types
 - **THEN** loading SHALL raise a `ValueError` at startup with a descriptive message
-
-### Requirement: Model parsed into dataclasses
-`ModelDef` and `CommandDef` SHALL be implemented as Python `dataclasses`. Validation SHALL be done in a `from_dict()` class method; no third-party validation library is used.
-
-### Requirement: Model selected at startup
-The active model SHALL be selected by CLI argument (model name or file path). The default SHALL be `eh_tw3200`.
-
-#### Scenario: Default model
-- **WHEN** no model argument is provided
-- **THEN** `models/eh_tw3200.yaml` is loaded
-
-#### Scenario: Explicit model argument
-- **WHEN** `--model eh_tw9400` is passed
-- **THEN** `models/eh_tw9400.yaml` is loaded
 
 ### Requirement: EH-TW3200 model file
 A complete model definition file for the EH-TW3200 SHALL exist at `models/eh_tw3200.yaml`, covering all supported ESC/VP21 commands. The volume command SHALL be named `VOL` (not `VOLUME`) to match the ESC/VP21 specification.

@@ -53,6 +53,11 @@ def main() -> None:
         help="TCP port for HTTP transport. Default: 8080",
     )
     parser.add_argument(
+        "--http-password",
+        default=None,
+        help="Enable HTTP Digest authentication with this password (username: EPSONWEB). Omit to disable auth.",
+    )
+    parser.add_argument(
         "--loglevel",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="WARNING",
@@ -73,7 +78,7 @@ def main() -> None:
     transports = [
         SerialTransport(state, model, host=args.host, port=args.serial_port),
         VpnetTransport(state, model, host=args.host, port=args.vpnet_port),
-        HttpTransport(state, model, host=args.host, port=args.http_port),
+        HttpTransport(state, model, host=args.host, port=args.http_port, password=args.http_password),
     ]
 
     app = EmulatorApp(state=state, model=model, transports=transports)

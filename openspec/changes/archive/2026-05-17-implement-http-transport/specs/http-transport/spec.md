@@ -1,7 +1,7 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: HTTP server placeholder
-The HTTP transport SHALL start an HTTP server on port 8080 (default, configurable) that accepts connections. It SHALL route requests to `/cgi-bin/json_query` and `/cgi-bin/directsend`. All other paths SHALL return HTTP 404. When a password is configured, all routes SHALL be protected by Digest authentication middleware.
+The HTTP transport SHALL start an HTTP server on port 8080 (default, configurable) that accepts connections. It SHALL route requests to `/cgi-bin/json_query` and `/cgi-bin/directsend`. All other paths SHALL return HTTP 404.
 
 #### Scenario: GET any unknown path
 - **WHEN** an HTTP GET request is made to any path other than the two CGI endpoints
@@ -11,16 +11,10 @@ The HTTP transport SHALL start an HTTP server on port 8080 (default, configurabl
 - **WHEN** the emulator starts
 - **THEN** the HTTP server starts alongside serial and ESC/VP.net transports without blocking them
 
-#### Scenario: Server starts with password — middleware active
-- **WHEN** the emulator is started with `--http-password`
-- **THEN** the HTTP server applies Digest auth middleware to all routes
-
-#### Scenario: Server starts without password — no middleware
-- **WHEN** the emulator is started without `--http-password`
-- **THEN** the HTTP server starts with no authentication middleware (current behaviour)
+## ADDED Requirements
 
 ### Requirement: json_query endpoint
-The HTTP transport SHALL implement `GET /cgi-bin/json_query`. The `jsoncallback` query parameter SHALL be treated as an ESC/VP21 GET command string (e.g. `PWR?`). The response SHALL be JSON in the format `{"projector": {"feature": {"reply": "<value>"}}}`. 
+The HTTP transport SHALL implement `GET /cgi-bin/json_query`. The `jsoncallback` query parameter SHALL be treated as an ESC/VP21 GET command string (e.g. `PWR?`). The response SHALL be JSON in the format `{"projector": {"feature": {"reply": "<value>"}}}`.
 
 #### Scenario: Successful query
 - **WHEN** `GET /cgi-bin/json_query?jsoncallback=PWR?` is received

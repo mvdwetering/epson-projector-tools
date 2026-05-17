@@ -1,15 +1,84 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import json
 import logging
+import re
+import secrets
 
 from aiohttp import web
 
+from projector.engine import handle_command
 from projector.model import ModelDef
 from projector.state import ProjectorState
 from transports.base import BaseTransport
 
 logger = logging.getLogger(__name__)
+
+# IR codes → direct VP21 SET command string (TW3200 supported codes)
+_IR_DIRECT: dict[str, str] = {
+    "6C": "PWR OFF",    # Power OFF
+    "40": "SOURCE A0",  # HDMI2
+    "4D": "SOURCE 30",  # HDMI1
+    "44": "SOURCE 10",  # PC
+    "46": "SOURCE 40",  # Video
+}
+
+# IR codes whose VP21 source mapping is unknown — surface as an error
+_IR_UNKNOWN_SOURCE: frozenset[str] = frozenset({"43", "45"})  # Component, S-Video
+
+
+def _make_digest_middleware(password: str):
+    """Return an aiohttp middleware that enforces HTTP Digest authentication.
+
+    Protocol parameters match real Epson projectors (captured from device):
+      realm  = "Web Control"
+      username expected from client = "EPSONWEB"
+      algorithm = MD5 (field omitted in WWW-Authenticate, which is the RFC 2617
+                  default; the real projector also omits it)
+      qop    = "auth"
+
+    Nonce note: real projectors emit a structured nonce of the form
+      "<6-hex>:<md5-hash>"  e.g. "29a493:ab6e88cb8c835a1cd6214a1b83e754a4"
+    The emulator uses a flat secrets.token_hex(16) instead.  Both are opaque
+    strings per RFC 2617; the client echoes back whatever nonce the server sent.
+    """
+    _REALM = "Web Control"
+    _md5 = lambda s: hashlib.md5(s.encode()).hexdigest()  # noqa: E731
+    ha1 = _md5(f"EPSONWEB:{_REALM}:{password}")
+    # Mutable cell so the inner function can replace the nonce after each 401.
+    state = {"nonce": secrets.token_hex(16)}
+
+    @web.middleware
+    async def digest_auth(request: web.Request, handler):
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Digest "):
+            # Parse key="quoted" or key=unquoted fields from the Digest header.
+            fields: dict[str, str] = {}
+            for m in re.finditer(r'(\w+)=(?:"([^"]*)"|([\w:./=-]+))', auth_header):
+                fields[m.group(1)] = m.group(2) if m.group(2) is not None else (m.group(3) or "")
+            nonce   = fields.get("nonce", "")
+            nc      = fields.get("nc", "")
+            cnonce  = fields.get("cnonce", "")
+            response = fields.get("response", "")
+            ha2 = _md5(f"{request.method}:{request.path_qs}")
+            expected = _md5(f"{ha1}:{nonce}:{nc}:{cnonce}:auth:{ha2}")
+            if expected == response:
+                return await handler(request)
+        # Challenge: issue new random nonce so each 401 has a fresh nonce.
+        state["nonce"] = secrets.token_hex(16)
+        raise web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": (
+                    f'Digest realm="{_REALM}", '
+                    f'nonce="{state["nonce"]}", '
+                    f'qop="auth"'
+                )
+            }
+        )
+
+    return digest_auth
 
 
 class HttpTransport(BaseTransport):
@@ -19,15 +88,19 @@ class HttpTransport(BaseTransport):
         model: ModelDef,
         host: str = "0.0.0.0",
         port: int = 8080,
+        password: str | None = None,
     ) -> None:
         self._state = state
         self._model = model
         self._host = host
         self._port = port
+        self._password = password
 
     async def start(self) -> None:
-        app = web.Application()
-        app.router.add_route("*", "/{path_info:.*}", self._handle)
+        middlewares = [_make_digest_middleware(self._password)] if self._password else []
+        app = web.Application(middlewares=middlewares)
+        app.router.add_get("/cgi-bin/json_query", self._handle_json_query)
+        app.router.add_get("/cgi-bin/directsend", self._handle_directsend)
         runner = web.AppRunner(app)
         await runner.setup()
         site = web.TCPSite(runner, self._host, self._port)
@@ -36,5 +109,91 @@ class HttpTransport(BaseTransport):
         # Keep running until cancelled
         await asyncio.get_event_loop().create_future()
 
-    async def _handle(self, request: web.Request) -> web.Response:
-        return web.Response(text="HTTP transport not yet implemented\n")
+    # ------------------------------------------------------------------
+    # /cgi-bin/json_query?jsoncallback=CMD?
+    # ------------------------------------------------------------------
+
+    async def _handle_json_query(self, request: web.Request) -> web.Response:
+        cmd_str = request.rel_url.query.get("jsoncallback")
+        if not cmd_str:
+            raise web.HTTPBadRequest(reason="Missing jsoncallback parameter")
+        response = handle_command(self._state, self._model, cmd_str)
+        self._state.log_command("http", cmd_str, response)
+        value = self._extract_value(response, cmd_str)
+        body = json.dumps({"projector": {"feature": {"reply": value}}})
+        return web.Response(content_type="application/json", text=body)
+
+    # ------------------------------------------------------------------
+    # /cgi-bin/directsend?CMD=VALUE  or  /cgi-bin/directsend?KEY=ir_code
+    # ------------------------------------------------------------------
+
+    async def _handle_directsend(self, request: web.Request) -> web.Response:
+        params = list(request.rel_url.query.items())
+        if not params:
+            raise web.HTTPBadRequest(reason="No parameters supplied")
+        cmd, value = params[0]
+        if cmd.upper() == "KEY":
+            self._dispatch_key(value.upper())
+        else:
+            cmd_str = f"{cmd} {value}"
+            response = handle_command(self._state, self._model, cmd_str)
+            self._state.log_command("http", cmd_str, response)
+            if response.startswith("ERR"):
+                raise web.HTTPBadRequest(reason=f"Command failed: {cmd_str}")
+        return web.Response(status=200)
+
+    # ------------------------------------------------------------------
+    # IR key dispatch
+    # ------------------------------------------------------------------
+
+    def _dispatch_key(self, ir_code: str) -> None:
+        if ir_code in _IR_UNKNOWN_SOURCE:
+            raise web.HTTPBadRequest(
+                reason=f"Unknown VP21 source mapping for IR code {ir_code}"
+            )
+
+        # Power toggle
+        if ir_code == "3B":
+            cmd = "PWR OFF" if self._state.get("PWR") == "01" else "PWR ON"
+            self._exec(cmd)
+            return
+
+        # Mute toggle
+        if ir_code == "3E":
+            cmd = "MUTE OFF" if self._state.get("MUTE") == "ON" else "MUTE ON"
+            self._exec(cmd)
+            return
+
+        # Direct VP21 mapping
+        if ir_code in _IR_DIRECT:
+            self._exec(_IR_DIRECT[ir_code])
+            return
+
+        # Fallback: pass to engine as KEY <code> (notify_only for nav/menu keys)
+        cmd_str = f"KEY {ir_code}"
+        response = handle_command(self._state, self._model, cmd_str)
+        self._state.log_command("http", cmd_str, response)
+        if response.startswith("ERR"):
+            raise web.HTTPBadRequest(reason=f"Unhandled IR key code: {ir_code}")
+
+    def _exec(self, cmd_str: str) -> None:
+        """Run a VP21 command through the engine; raise on ERR."""
+        response = handle_command(self._state, self._model, cmd_str)
+        self._state.log_command("http", cmd_str, response)
+        if response.startswith("ERR"):
+            raise web.HTTPBadRequest(reason=f"Command failed: {cmd_str}")
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _extract_value(response: str, cmd_str: str) -> str:
+        """Parse 'CMD=value\\r:' → 'value'. Raises HTTPBadRequest on ERR."""
+        if response.startswith("ERR"):
+            raise web.HTTPBadRequest(reason=f"Command failed: {cmd_str}")
+        if "=" in response:
+            return response.split("=", 1)[1].rstrip("\r:")
+        raise web.HTTPBadRequest(
+            reason=f"Unexpected engine response: {response!r}"
+        )
