@@ -189,3 +189,44 @@ commands:
     readable: false
     writable: true
     notify_only: true
+
+# These are the key command codes as listed in the Excel
+# The key is a hexadecimal string, the value is the corresponding key name
+key_codes:
+  "01": Power
+  "03": Menu
+  "05": ESC
+  "16": Enter
+  "35": Up
+  "36": Down
+  "37": Left
+  "38": Right
+  "48": Source
+
+# These are the IR codes as listed in the Excel
+# The key is a hexadecimal string, the value is the function name
+ir_codes:
+  3B: Power  
+  6C: Power OFF
+  3C: Menu
+  3D: ESC
+  49: Enter
+  58: "Pointer: Up"
+  59: "Pointer: Down"
+  5A: "Pointer: Left"
+  5B: "Pointer: Right"
+  43: Component
+  44: PC
+  45: S-Video
+  46: Video
+  40: HDMI2
+  4D: HDMI1
+  3E: A/V Mute
+  3F: Color Mode
+  4B: Pattern
+  20: Aspect
+  61: Memory (1)
+  83: 1Dγ # The y is probably an encoding error, but I don't know what it should be
+  87: Sharpness
+  88: Default
+  89: RGBCMY
