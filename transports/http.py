@@ -16,6 +16,14 @@ from transports.base import BaseTransport
 
 logger = logging.getLogger(__name__)
 
+
+class PasswordStore:
+    """Mutable container for the HTTP Digest authentication password."""
+
+    def __init__(self, password: str) -> None:
+        self.password = password
+
+
 # IR codes → direct VP21 SET command string (TW3200 supported codes)
 _IR_DIRECT: dict[str, str] = {
     "6C": "PWR OFF",    # Power OFF
@@ -29,7 +37,7 @@ _IR_DIRECT: dict[str, str] = {
 _IR_UNKNOWN_SOURCE: frozenset[str] = frozenset({"43", "45"})  # Component, S-Video
 
 
-def _make_digest_middleware(password: str):
+def _make_digest_middleware(store: PasswordStore):
     """Return an aiohttp middleware that enforces HTTP Digest authentication.
 
     Protocol parameters match real Epson projectors (captured from device):
@@ -46,12 +54,13 @@ def _make_digest_middleware(password: str):
     """
     _REALM = "Web Control"
     _md5 = lambda s: hashlib.md5(s.encode()).hexdigest()  # noqa: E731
-    ha1 = _md5(f"EPSONWEB:{_REALM}:{password}")
     # Mutable cell so the inner function can replace the nonce after each 401.
     state = {"nonce": secrets.token_hex(16)}
 
     @web.middleware
     async def digest_auth(request: web.Request, handler):
+        # Recompute ha1 per-request so runtime password changes take effect immediately.
+        ha1 = _md5(f"EPSONWEB:{_REALM}:{store.password}")
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Digest "):
             # Parse key="quoted" or key=unquoted fields from the Digest header.
@@ -88,7 +97,7 @@ class HttpTransport(BaseTransport):
         model: ModelDef,
         host: str = "0.0.0.0",
         port: int = 8080,
-        password: str | None = None,
+        password: PasswordStore | None = None,
     ) -> None:
         self._state = state
         self._model = model

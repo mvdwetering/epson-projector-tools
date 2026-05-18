@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.widgets import DataTable, Footer, Header, RichLog
-from textual.containers import Horizontal
+from textual.screen import ModalScreen
+from textual.widgets import DataTable, Footer, Header, Input, Label, RichLog
+from textual.containers import Horizontal, Vertical
 
 from projector.engine import handle_command
 from projector.model import ModelDef
@@ -15,6 +16,47 @@ from projector.state import ProjectorState
 
 if TYPE_CHECKING:
     from transports.base import BaseTransport
+    from transports.http import PasswordStore
+
+
+class ChangePasswordScreen(ModalScreen["str | None"]):
+    """Modal dialog for changing the HTTP Digest password at runtime."""
+
+    DEFAULT_CSS = """
+    ChangePasswordScreen {
+        align: center middle;
+    }
+    #pw-dialog {
+        width: 68;
+        height: auto;
+        border: solid $primary;
+        background: $surface;
+        padding: 1 2;
+    }
+    #pw-dialog Label {
+        margin-bottom: 1;
+    }
+    """
+
+    def __init__(self, current_password: str) -> None:
+        super().__init__()
+        self._current_password = current_password
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="pw-dialog"):
+            yield Label("Change HTTP Digest password (Enter to confirm, Esc to cancel):")
+            yield Input(value=self._current_password, id="pw-input")
+
+    def on_mount(self) -> None:
+        self.query_one(Input).focus()
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        self.dismiss(event.value or None)
+
+    def on_key(self, event) -> None:
+        if event.key == "escape":
+            self.dismiss(None)
+            event.stop()
 
 
 class EmulatorApp(App[None]):
@@ -47,6 +89,7 @@ class EmulatorApp(App[None]):
 
     BINDINGS = [
         Binding("p", "toggle_power", "Toggle Power"),
+        Binding("w", "change_password", "Change Password"),
         Binding("q", "quit", "Quit"),
     ]
 
@@ -55,11 +98,13 @@ class EmulatorApp(App[None]):
         state: ProjectorState,
         model: ModelDef,
         transports: list["BaseTransport"],
+        password_store: "PasswordStore | None" = None,
     ) -> None:
         super().__init__()
         self._state = state
         self._model = model
         self._transports = transports
+        self._password_store = password_store
         self._state_queue: asyncio.Queue[tuple[str, str]] = asyncio.Queue()
         self._cmd_queue: asyncio.Queue[tuple[str, str, str]] = asyncio.Queue()
 
@@ -136,3 +181,19 @@ class EmulatorApp(App[None]):
         current = self._state.get("PWR")
         new_cmd = "PWR ON" if current != "01" else "PWR OFF"
         handle_command(self._state, self._model, new_cmd)
+
+    def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
+        if action == "change_password" and self._password_store is None:
+            return None
+        return True
+
+    def action_change_password(self) -> None:
+        if self._password_store is None:
+            return
+        store = self._password_store
+
+        def on_dismiss(new_password: str | None) -> None:
+            if new_password:
+                store.password = new_password
+
+        self.push_screen(ChangePasswordScreen(store.password), on_dismiss)

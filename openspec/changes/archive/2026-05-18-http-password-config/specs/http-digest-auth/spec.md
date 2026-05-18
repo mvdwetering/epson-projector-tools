@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: HTTP Digest authentication challenge
 When the emulator is started with the `--http-password` flag, the HTTP transport SHALL challenge unauthenticated requests with HTTP Digest authentication. Requests to all HTTP endpoints without a valid `Authorization` header SHALL receive a `401 Unauthorized` response containing a `WWW-Authenticate` header with `realm="Web Control"`, a randomly generated nonce, and `qop="auth"`. No `algorithm` field SHALL be emitted (defaults to MD5 per RFC 2617).
@@ -29,29 +29,7 @@ The password used for authentication SHALL default to the hardcoded value `"http
 - **WHEN** the runtime password has been changed AND a client sends a Digest response computed with the old password
 - **THEN** the server returns HTTP 401
 
-### Requirement: Digest authentication parameters
-The Digest authentication SHALL use the following fixed parameters matching the real Epson projector protocol:
-- **Realm**: `"Web Control"`
-- **Username**: `"EPSONWEB"` (expected from client; only this username is accepted)
-- **Algorithm**: MD5 (RFC 2617 default; field omitted from `WWW-Authenticate`)
-- **qop**: `"auth"`
-
-HA1 SHALL be computed as `MD5("EPSONWEB:Web Control:<password>")` once at startup. Per-request verification SHALL compute `HA2 = MD5("<method>:<request-uri>")` and `response = MD5("<HA1>:<nonce>:<nc>:<cnonce>:auth:<HA2>")`.
-
-#### Scenario: Correct HA1/HA2/response computation
-- **WHEN** a client sends `Authorization: Digest username="EPSONWEB", realm="Web Control", nonce="<n>", nc=<nc>, cnonce="<c>", qop=auth, response="<r>"`
-- **THEN** the server accepts the request if and only if `MD5(MD5("EPSONWEB:Web Control:<password>"):<n>:<nc>:<c>:auth:MD5("GET:<uri>"))` equals `<r>`
-
-### Requirement: Nonce lifecycle
-A fresh random nonce SHALL be generated for each `401` challenge. The nonce SHALL be stored in the middleware for verification of the subsequent authenticated request. Nonce-count (`nc`) validation SHALL NOT be performed — any `nc` value from the client is accepted.
-
-#### Scenario: Nonce is random per challenge
-- **WHEN** two separate unauthenticated requests trigger two separate 401 responses
-- **THEN** each 401 response contains a different `nonce` value
-
-#### Scenario: Client reuses nonce across multiple requests
-- **WHEN** an authenticated client sends successive requests with the same nonce and incrementing `nc`
-- **THEN** each request is accepted without re-challenging
+## ADDED Requirements
 
 ### Requirement: HTTP Digest password mutable at runtime
 The HTTP transport SHALL recompute `HA1 = MD5("EPSONWEB:Web Control:<password>")` on every incoming authenticated request using the current password value so that password changes take effect immediately without a server restart.
