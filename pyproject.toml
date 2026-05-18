@@ -3,9 +3,9 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "epson-emulator"
+name = "epson-projector-tools"
 version = "0.1.0"
-description = "Epson projector emulator supporting serial TCP, ESC/VP.net, and HTTP transports"
+description = "Epson projector toolkit: emulator and interactive terminal for serial TCP, ESC/VP.net, and HTTP transports"
 requires-python = ">=3.10"
 dependencies = [
     "textual>=0.80.0",
@@ -15,7 +15,11 @@ dependencies = [
 
 [project.scripts]
 epson-emulator = "main:main"
+epson-terminal = "terminal:main"
+
+[tool.setuptools]
+py-modules = ["terminal", "main"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["projector*", "transports*", "ui*"]
+include = ["projector*", "transports*", "ui*", "client*"]

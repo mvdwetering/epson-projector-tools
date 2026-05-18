@@ -1,0 +1,576 @@
+from __future__ import annotations
+
+import asyncio
+from datetime import datetime
+from typing import Optional, TYPE_CHECKING
+
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import Horizontal, Vertical, ScrollableContainer
+from textual.screen import ModalScreen
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Input,
+    Label,
+    Select,
+    TextArea,
+)
+from textual.reactive import reactive
+
+from client.base import AbstractProjectorClient, ClientNotConnectedError
+from client.serial import SerialClient
+from client.vpnet import VpnetClient
+from client.http import HttpClient
+
+if TYPE_CHECKING:
+    from projector.model import ModelDef
+
+_DEFAULT_PORTS: dict[str, int] = {"serial": 12345, "vpnet": 3629, "http": 80}
+_DEFAULT_QUICK_CMDS = ["SNO?", "PWR?", "PWR ON", "PWR OFF", "SOURCE?"]
+
+_PROTOCOL_LABELS = [
+    ("Serial TCP", "serial"),
+    ("ESC/VP.net", "vpnet"),
+    ("HTTP", "http"),
+]
+
+
+# ---------------------------------------------------------------------------
+# Connect dialog
+# ---------------------------------------------------------------------------
+
+class ConnectDialog(ModalScreen["dict | None"]):
+    """Modal dialog for establishing or switching a projector connection."""
+
+    DEFAULT_CSS = """
+    ConnectDialog {
+        align: center middle;
+    }
+    #connect-dialog {
+        width: 70;
+        height: auto;
+        border: solid $primary;
+        background: $surface;
+        padding: 1 2;
+    }
+    #connect-dialog Label {
+        margin-top: 1;
+    }
+    #connect-buttons {
+        margin-top: 1;
+        height: auto;
+        align: right middle;
+    }
+    #connect-buttons Button {
+        margin-left: 1;
+    }
+    """
+
+    def __init__(self, prefill: Optional[dict] = None) -> None:
+        super().__init__()
+        self._prefill = prefill or {}
+
+    def compose(self) -> ComposeResult:
+        pre = self._prefill
+        proto = pre.get("protocol", "vpnet")
+        with Vertical(id="connect-dialog"):
+            yield Label("Protocol:")
+            yield Select(
+                [(label, val) for label, val in _PROTOCOL_LABELS],
+                value=proto,
+                id="proto-select",
+            )
+            yield Label("Host:")
+            yield Input(value=pre.get("host", ""), placeholder="192.168.1.50", id="host-input")
+            yield Label("Port:")
+            yield Input(
+                value=str(pre.get("port", _DEFAULT_PORTS[proto])),
+                placeholder="port",
+                id="port-input",
+            )
+            yield Label("Password (HTTP only):")
+            yield Input(
+                value=pre.get("password", ""),
+                placeholder="leave blank if not required",
+                password=True,
+                id="password-input",
+            )
+            yield Label("Model path (optional):")
+            yield Input(
+                value=pre.get("model_path", ""),
+                placeholder="models/eh_tw3200.yaml",
+                id="model-input",
+            )
+            with Horizontal(id="connect-buttons"):
+                yield Button("Cancel", variant="default", id="btn-cancel")
+                yield Button("Connect", variant="primary", id="btn-connect")
+
+    def on_mount(self) -> None:
+        self.query_one("#host-input", Input).focus()
+        self._update_password_visibility()
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        if event.select.id == "proto-select":
+            proto = str(event.value)
+            port_input = self.query_one("#port-input", Input)
+            port_input.value = str(_DEFAULT_PORTS.get(proto, 80))
+            self._update_password_visibility()
+
+    def _update_password_visibility(self) -> None:
+        proto = str(self.query_one("#proto-select", Select).value)
+        pw_label = self.query("Label")[-2]  # "Password (HTTP only):" label
+        pw_input = self.query_one("#password-input", Input)
+        pw_label.display = proto == "http"
+        pw_input.display = proto == "http"
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "btn-cancel":
+            self.dismiss(None)
+        elif event.button.id == "btn-connect":
+            self._submit()
+
+    def on_key(self, event) -> None:
+        if event.key == "escape":
+            self.dismiss(None)
+            event.stop()
+
+    def _submit(self) -> None:
+        proto = str(self.query_one("#proto-select", Select).value)
+        host = self.query_one("#host-input", Input).value.strip()
+        port_str = self.query_one("#port-input", Input).value.strip()
+        password = self.query_one("#password-input", Input).value
+        model_path = self.query_one("#model-input", Input).value.strip()
+        try:
+            port = int(port_str)
+        except ValueError:
+            port = _DEFAULT_PORTS.get(proto, 80)
+        self.dismiss({
+            "protocol": proto,
+            "host": host,
+            "port": port,
+            "password": password,
+            "model_path": model_path or None,
+        })
+
+
+# ---------------------------------------------------------------------------
+# Main terminal app
+# ---------------------------------------------------------------------------
+
+class TerminalApp(App[None]):
+    """Interactive Epson projector terminal TUI."""
+
+    CSS = """
+    Screen { layout: vertical; }
+
+    #panels { height: 1fr; }
+
+    #left-col {
+        width: 36;
+        min-width: 28;
+    }
+
+    #info-panel {
+        height: auto;
+        border: solid $primary;
+        padding: 0 1;
+    }
+    #info-panel Label { height: 1; }
+    #status-label { color: $success; }
+
+    #quick-panel {
+        height: auto;
+        border: solid $accent;
+        padding: 0 1;
+    }
+    #quick-panel Label { height: 1; }
+    #quick-buttons { height: auto; layout: grid; grid-size: 2; grid-gutter: 0; }
+    #quick-buttons Button { width: 1fr; }
+
+    #input-panel {
+        height: 1fr;
+        border: solid $secondary;
+        padding: 0 1;
+    }
+    #input-panel Label { height: 1; }
+    TextArea { height: 1fr; }
+    #hint-label { height: 1; color: $text-muted; }
+
+    #log-panel {
+        width: 1fr;
+        border: solid $secondary;
+        padding: 0 1;
+    }
+    #cmd-log { height: 1fr; }
+    """
+
+    BINDINGS = [
+        Binding("ctrl+s", "send_commands", "Send", show=True, priority=True),
+        Binding("ctrl+o", "open_connect", "Connect", show=True, priority=True),
+        Binding("c", "open_connect", "Connect", show=False),
+        Binding("ctrl+q", "quit", "Quit", show=True, priority=True),
+        Binding("q", "quit", "Quit", show=False),
+    ]
+
+    status_text: reactive[str] = reactive("Disconnected")
+    status_style: reactive[str] = reactive("red")
+
+    def __init__(
+        self,
+        client: Optional[AbstractProjectorClient] = None,
+        model: Optional["ModelDef"] = None,
+        initial_params: Optional[dict] = None,
+    ) -> None:
+        super().__init__()
+        self._client = client
+        self._model = model
+        self._initial_params = initial_params or {}
+        self._history: list[str] = []
+        self._history_idx: int = -1
+        self._reconnect_countdown_timer: Optional[object] = None
+        self._reconnect_next_s: int = 0
+        self._reconnect_attempt: int = 0
+        self._cmd_queue: asyncio.Queue = asyncio.Queue()
+        self._sending = False
+
+    # ------------------------------------------------------------------
+    # Compose
+    # ------------------------------------------------------------------
+
+    def compose(self) -> ComposeResult:
+        yield Header(show_clock=True)
+        with Horizontal(id="panels"):
+            with Vertical(id="left-col"):
+                with Vertical(id="info-panel"):
+                    yield Label("Connection", markup=True)
+                    yield Label("", id="proto-label")
+                    yield Label("", id="host-label")
+                    yield Label("", id="port-label")
+                    yield Label("Disconnected", id="status-label")
+                with Vertical(id="quick-panel"):
+                    yield Label("Quick commands")
+                    with Horizontal(id="quick-buttons"):
+                        pass  # populated in on_mount
+                with Vertical(id="input-panel"):
+                    yield Label("[Ctrl+S] send  [↑/↓] history")
+                    yield TextArea(id="cmd-input")
+                    yield Label("", id="hint-label")
+            with Vertical(id="log-panel"):
+                yield Label("Command log  [select text to copy]")
+                yield TextArea("", read_only=True, id="cmd-log")
+        yield Footer()
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    async def on_mount(self) -> None:
+        self._populate_quick_commands()
+        if self._client is not None:
+            self._attach_client(self._client, self._initial_params)
+            asyncio.create_task(self._connect_client())
+        else:
+            self.call_after_refresh(self.action_open_connect)
+
+    async def on_unmount(self) -> None:
+        if self._client is not None:
+            await self._client.disconnect()
+
+    async def _connect_client(self) -> None:
+        assert self._client is not None
+        try:
+            await self._client.connect()
+        except Exception as exc:
+            self._log_system(f"Connection failed: {exc}")
+
+    # ------------------------------------------------------------------
+    # Client attachment
+    # ------------------------------------------------------------------
+
+    def _attach_client(
+        self, client: AbstractProjectorClient, params: Optional[dict]
+    ) -> None:
+        """Store client, wire state callback, update info panel labels."""
+        self._client = client
+        self._client._on_state_change = self._on_state_change
+
+        if params:
+            self.query_one("#proto-label", Label).update(
+                f"Protocol: [bold]{params.get('protocol','?')}[/bold]"
+            )
+            self.query_one("#host-label", Label).update(
+                f"Host:     {params.get('host','?')}"
+            )
+            self.query_one("#port-label", Label).update(
+                f"Port:     {params.get('port','?')}"
+            )
+
+    def _on_state_change(self, state: str, attempt: int, next_retry_s: int) -> None:
+        """Called from the client — may be an asyncio task or a background thread."""
+        try:
+            asyncio.get_running_loop()
+            # Already on the event loop (e.g. HTTP connect or serial asyncio task).
+            self.call_later(self._apply_state, state, attempt, next_retry_s)
+        except RuntimeError:
+            # Called from a background OS thread.
+            self.call_from_thread(self._apply_state, state, attempt, next_retry_s)
+
+    def _apply_state(self, state: str, attempt: int, next_retry_s: int) -> None:
+        status_label = self.query_one("#status-label", Label)
+        if self._reconnect_countdown_timer is not None:
+            self._reconnect_countdown_timer.stop()
+            self._reconnect_countdown_timer = None
+
+        if state == "connected":
+            status_label.update("[green]Connected[/green]")
+        elif state == "disconnected":
+            status_label.update("[red]Disconnected[/red]")
+        elif state == "reconnecting":
+            self._reconnect_next_s = next_retry_s
+            self._reconnect_attempt = attempt
+            status_label.update(
+                f"[yellow]Reconnecting… {next_retry_s}s[/yellow]"
+            )
+            self._reconnect_countdown_timer = self.set_interval(
+                1.0, self._tick_reconnect_countdown
+            )
+
+    def _tick_reconnect_countdown(self) -> None:
+        if self._reconnect_next_s > 1:
+            self._reconnect_next_s -= 1
+            self.query_one("#status-label", Label).update(
+                f"[yellow]Reconnecting… {self._reconnect_next_s}s[/yellow]"
+            )
+        else:
+            if self._reconnect_countdown_timer:
+                self._reconnect_countdown_timer.stop()
+                self._reconnect_countdown_timer = None
+
+    # ------------------------------------------------------------------
+    # Quick commands
+    # ------------------------------------------------------------------
+
+    def _populate_quick_commands(self) -> None:
+        container = self.query_one("#quick-buttons")
+        container.remove_children()
+        if self._model is not None:
+            cmds = [
+                cmd for cmd, defn in self._model.commands.items() if defn.readable
+            ]
+            cmds = sorted(cmds)
+        else:
+            cmds = _DEFAULT_QUICK_CMDS
+        for cmd in cmds:
+            btn = Button(cmd, id=f"qcmd-{cmd.replace(' ', '_').replace('?', 'Q')}")
+            btn.tooltip = cmd
+            container.mount(btn)
+
+    async def on_button_pressed(self, event: Button.Pressed) -> None:
+        btn_id = event.button.id or ""
+        if btn_id.startswith("qcmd-"):
+            # Extract command from button label
+            cmd = str(event.button.label)
+            await self._do_send([cmd])
+
+    # ------------------------------------------------------------------
+    # Send action
+    # ------------------------------------------------------------------
+
+    async def action_send_commands(self) -> None:
+        textarea = self.query_one("#cmd-input", TextArea)
+        text = textarea.text.strip()
+        if not text:
+            return
+        lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+        if not lines:
+            return
+        # Save to history
+        self._history.insert(0, text)
+        self._history_idx = -1
+        # Clear input
+        textarea.clear()
+        await self._do_send(lines)
+
+    async def _do_send(self, lines: list[str]) -> None:
+        if self._client is None:
+            self._log_system("No active connection.")
+            return
+        is_batch = len(lines) > 1
+        if is_batch:
+            self._append_to_log(f"{_timestamp()}  -- batch ({len(lines)} cmds) --")
+        for cmd in lines:
+            ts = _timestamp()
+            try:
+                response, duration_ms = await self._client.send(cmd)
+            except ClientNotConnectedError:
+                self._append_to_log(f"{ts}  {cmd}  ->  (not connected)")
+                continue
+            except Exception as exc:
+                self._append_to_log(f"{ts}  {cmd}  ->  Error: {exc}")
+                continue
+            self._write_log_entry(ts, cmd, response, duration_ms, indent=is_batch)
+
+    def _write_log_entry(
+        self,
+        ts: str,
+        cmd: str,
+        response: str,
+        duration_ms: float,
+        indent: bool = False,
+    ) -> None:
+        display_resp = response.replace("\r:", "").strip()
+        err_marker = "[ERR]  " if display_resp == "ERR" else ""
+        display_resp = display_resp or "OK"
+        prefix = "  " if indent else ""
+        self._append_to_log(
+            f"{prefix}{ts}  {cmd}  ->  {err_marker}{display_resp}  [{duration_ms:.0f} ms]"
+        )
+
+    def _log_system(self, msg: str) -> None:
+        self._append_to_log(f"{_timestamp()}  >> {msg}")
+
+    def _append_to_log(self, line: str) -> None:
+        log = self.query_one("#cmd-log", TextArea)
+        log.read_only = False
+        text_to_add = ("\n" if log.text else "") + line
+        log.insert(text_to_add, location=log.document.end, maintain_selection_offset=True)
+        log.read_only = True
+        log.scroll_end(animate=False)
+
+    # ------------------------------------------------------------------
+    # History navigation
+    # ------------------------------------------------------------------
+
+    async def on_key(self, event) -> None:
+        focused = self.focused
+        textarea = self.query_one("#cmd-input", TextArea)
+        if focused is not textarea:
+            return
+        if event.key == "up":
+            if self._history and self._history_idx < len(self._history) - 1:
+                self._history_idx += 1
+                textarea.clear()
+                textarea.insert(self._history[self._history_idx])
+            event.stop()
+        elif event.key == "down":
+            if self._history_idx > 0:
+                self._history_idx -= 1
+                textarea.clear()
+                textarea.insert(self._history[self._history_idx])
+            elif self._history_idx == 0:
+                self._history_idx = -1
+                textarea.clear()
+            event.stop()
+
+    # ------------------------------------------------------------------
+    # Model hints
+    # ------------------------------------------------------------------
+
+    async def on_text_area_changed(self, event: TextArea.Changed) -> None:
+        if event.text_area.id != "cmd-input":
+            return
+        if self._model is None:
+            return
+        text = event.text_area.text
+        # Get the line under the cursor
+        lines = text.split("\n")
+        # Use current cursor row
+        row = event.text_area.cursor_location[0]
+        current_line = lines[row] if row < len(lines) else ""
+        self._update_hint(current_line)
+
+    def _update_hint(self, line: str) -> None:
+        hint_label = self.query_one("#hint-label", Label)
+        if self._model is None:
+            hint_label.update("")
+            return
+        parts = line.strip().split(" ", 1)
+        cmd_name = parts[0].rstrip("?").upper() if parts else ""
+        if not cmd_name:
+            hint_label.update("")
+            return
+        cmd_def = self._model.commands.get(cmd_name)
+        if cmd_def is None:
+            hint_label.update(f"[yellow]Unknown command: {cmd_name}[/yellow]")
+            return
+        # Only show hints when a space has been typed after the command name
+        if len(parts) < 2 and not line.strip().endswith(" "):
+            hint_label.update("")
+            return
+        hints = []
+        if cmd_def.range:
+            hints.append(f"range: {cmd_def.range[0]}–{cmd_def.range[1]}")
+        if cmd_def.set_values:
+            hints.append(f"values: {', '.join(cmd_def.set_values)}")
+        elif cmd_def.set_map:
+            hints.append(f"values: {', '.join(cmd_def.set_map.keys())}")
+        if hints:
+            hint_label.update(f"[dim]{cmd_name} — {'; '.join(hints)}[/dim]")
+        else:
+            hint_label.update("")
+
+    # ------------------------------------------------------------------
+    # Connect dialog
+    # ------------------------------------------------------------------
+
+    async def action_open_connect(self) -> None:
+        prefill = self._initial_params.copy() if self._initial_params else {}
+        if self._model:
+            prefill.setdefault("model_path", "")
+
+        async def _on_result(result: "dict | None") -> None:
+            if result is None:
+                return
+            await self._apply_new_connection(result)
+
+        await self.push_screen(ConnectDialog(prefill=prefill), _on_result)
+
+    async def _apply_new_connection(self, params: dict) -> None:
+        # Close existing connection
+        if self._client is not None:
+            try:
+                await self._client.disconnect()
+            except Exception:
+                pass
+            self._client = None
+
+        # Optionally load a new model
+        if params.get("model_path"):
+            try:
+                from projector.model import load_model
+                self._model = load_model(params["model_path"])
+                self._populate_quick_commands()
+            except Exception as exc:
+                self._log_system(f"Model load failed: {exc}")
+
+        protocol = params["protocol"]
+        host = params["host"]
+        port = params["port"]
+        password = params.get("password", "")
+
+        if not host:
+            self._log_system("No host specified — not connecting.")
+            return
+
+        if protocol == "serial":
+            client: AbstractProjectorClient = SerialClient(host, port)
+        elif protocol == "vpnet":
+            client = VpnetClient(host, port)
+        else:
+            client = HttpClient(host, port, password)
+
+        self._initial_params = params
+        self._attach_client(client, params)
+        self._log_system(f"Connecting to {host}:{port} via {protocol}…")
+        asyncio.create_task(self._connect_client())
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _timestamp() -> str:
+    now = datetime.now()
+    return now.strftime("%H:%M:%S.") + f"{now.microsecond // 1000:03d}"
