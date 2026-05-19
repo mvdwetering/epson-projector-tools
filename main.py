@@ -53,9 +53,9 @@ def main() -> None:
         help="TCP port for HTTP transport. Default: 8080",
     )
     parser.add_argument(
-        "--http-password",
+        "--password",
         action="store_true",
-        help="Enable HTTP Digest authentication (default password: httppassword, username: EPSONWEB). Press 'w' in TUI to change at runtime.",
+        help="Enable password authentication on all network transports (ESC/VP.net and HTTP). Default password: emulatorpassword. Press 'w' in TUI to change at runtime.",
     )
     parser.add_argument(
         "--loglevel",
@@ -75,11 +75,11 @@ def main() -> None:
     model = load_model(model_path)
     state = ProjectorState(model)
 
-    password_store = PasswordStore("httppassword") if args.http_password else None
+    password_store = PasswordStore("emulatorpassword") if args.password else None
 
     transports = [
         SerialTransport(state, model, host=args.host, port=args.serial_port),
-        VpnetTransport(state, model, host=args.host, port=args.vpnet_port),
+        VpnetTransport(state, model, host=args.host, port=args.vpnet_port, password_store=password_store),
         HttpTransport(state, model, host=args.host, port=args.http_port, password=password_store),
     ]
 

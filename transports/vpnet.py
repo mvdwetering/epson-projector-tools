@@ -3,10 +3,14 @@ from __future__ import annotations
 import asyncio
 import logging
 import struct
+from typing import TYPE_CHECKING
 
 from projector.model import ModelDef
 from projector.state import ProjectorState
 from transports.base import BaseTransport, handle_escvp21_stream
+
+if TYPE_CHECKING:
+    from transports.http import PasswordStore
 
 logger = logging.getLogger(__name__)
 
@@ -31,11 +35,13 @@ class VpnetTransport(BaseTransport):
         model: ModelDef,
         host: str = "0.0.0.0",
         port: int = 3629,
+        password_store: PasswordStore | None = None,
     ) -> None:
         self._state = state
         self._model = model
         self._host = host
         self._port = port
+        self._password_store = password_store
 
     async def start(self) -> None:
         server = await asyncio.start_server(
@@ -89,11 +95,41 @@ class VpnetTransport(BaseTransport):
             logger.warning("vpnet: expected CONNECT (0x03), got 0x%02x", pkt_type)
             return False
 
-        await self._skip_extra_headers(reader, header[15])
+        headers = await self._parse_extra_headers(reader, header[15])
+
+        if self._password_store is not None:
+            password_header = headers.get(0x01)  # 0x01 = Password identifier
+            if password_header is None:
+                logger.warning("vpnet: password required but not provided, rejecting")
+                writer.write(_make_packet(_TYPE_CONNECT, 0x41))  # Unauthorized
+                await writer.drain()
+                return False
+            _, pw_bytes = password_header
+            sent_password = pw_bytes.rstrip(b"\x00").decode("ascii", errors="replace")
+            if sent_password != self._password_store.password:
+                logger.warning("vpnet: wrong password, rejecting")
+                writer.write(_make_packet(_TYPE_CONNECT, 0x43))  # Forbidden
+                await writer.drain()
+                return False
+
         writer.write(_make_packet(_TYPE_CONNECT, _STATUS_OK))
         await writer.drain()
         logger.info("vpnet: handshake complete, entering ESC/VP21 pipe")
         return True
+
+    @staticmethod
+    async def _parse_extra_headers(
+        reader: asyncio.StreamReader, count: int
+    ) -> dict[int, tuple[int, bytes]]:
+        """Read `count` extra headers and return {header_id: (attribute, 16-byte data)}."""
+        result: dict[int, tuple[int, bytes]] = {}
+        for _ in range(count):
+            data = await reader.readexactly(_EXTRA_HEADER_SIZE)
+            hdr_id = data[0]
+            hdr_attr = data[1]
+            hdr_data = data[2:18]
+            result[hdr_id] = (hdr_attr, hdr_data)
+        return result
 
     @staticmethod
     async def _skip_extra_headers(reader: asyncio.StreamReader, count: int) -> None:

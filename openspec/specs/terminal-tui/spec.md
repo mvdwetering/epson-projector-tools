@@ -87,7 +87,7 @@ The terminal SHALL provide a two-screen connection flow instead of a single moda
 
 **Screen 1 — Preset List** is shown on startup when at least one preset exists. It displays all saved presets as selectable rows, each showing name, protocol, and host. Key bindings: `Enter` or `c` connects to the selected preset; `n` opens Screen 2 blank (new preset); `e` opens Screen 2 pre-filled with the selected preset (edit); `d` deletes the selected preset after a confirmation prompt; `Esc`/`q` quits the application.
 
-**Screen 2 — Connection Form** is shown on startup when no presets exist, or when navigated to from Screen 1. Fields: Name (text, optional — if blank the connection is not saved), Protocol (select: serial/vpnet/http), Host (text), Port (text, auto-filled by protocol), Password (text, hidden unless HTTP selected). Actions: `[Connect]` saves the preset if a name is given and then connects; `[Connect without saving]` connects without saving; `[Back]` returns to Screen 1.
+**Screen 2 — Connection Form** is shown on startup when no presets exist, or when navigated to from Screen 1. Fields: Name (text, optional — if blank the connection is not saved), Protocol (select: serial/vpnet/http), Host (text), Port (text, auto-filled by protocol), Password (text, hidden unless `vpnet` or `http` is selected; label reads "Password (ESC/VP.net / HTTP)"). Actions: `[Connect]` saves the preset if a name is given and then connects; `[Connect without saving]` connects without saving; `[Back]` returns to Screen 1.
 
 #### Scenario: Preset list on startup
 - **WHEN** the terminal is launched with no CLI arguments and at least one preset exists
@@ -120,6 +120,18 @@ The terminal SHALL provide a two-screen connection flow instead of a single moda
 #### Scenario: Port auto-fill
 - **WHEN** the user selects "ESC/VP.net" in the protocol dropdown on Screen 2
 - **THEN** the port field is automatically set to `3629`
+
+#### Scenario: Password field hidden for serial
+- **WHEN** the user selects the `serial` protocol in the connection form
+- **THEN** the password field and its label are hidden
+
+#### Scenario: Password field visible for vpnet
+- **WHEN** the user selects the `vpnet` protocol in the connection form
+- **THEN** the password field and its label are shown
+
+#### Scenario: Password field visible for http
+- **WHEN** the user selects the `http` protocol in the connection form
+- **THEN** the password field and its label are shown
 
 ---
 

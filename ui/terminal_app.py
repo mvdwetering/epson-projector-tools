@@ -283,7 +283,7 @@ class ConnectionFormScreen(Screen["dict | None"]):
                 placeholder="port",
                 id="port-input",
             )
-            yield Label("Password (HTTP only):", id="password-label")
+            yield Label("Password (ESC/VP.net / HTTP):", id="password-label")
             yield Input(
                 value=pre.get("password", ""),
                 placeholder="leave blank if not required",
@@ -307,7 +307,7 @@ class ConnectionFormScreen(Screen["dict | None"]):
 
     def _update_password_visibility(self) -> None:
         proto = str(self.query_one("#proto-select", Select).value)
-        visible = proto == "http"
+        visible = proto in ("vpnet", "http")
         self.query_one("#password-label", Label).display = visible
         self.query_one("#password-input", Input).display = visible
 
@@ -558,8 +558,10 @@ class TerminalApp(App[None]):
 
         if state == "connected":
             status_label.update("[green]Connected[/green]")
+            self._log_system("Connected")
         elif state == "disconnected":
             status_label.update("[red]Disconnected[/red]")
+            self._log_system("Disconnected")
         elif state == "reconnecting":
             self._reconnect_next_s = next_retry_s
             self._reconnect_attempt = attempt
@@ -717,10 +719,12 @@ class TerminalApp(App[None]):
         # Close existing connection
         if self._client is not None:
             try:
+                self._client._on_state_change = None  # suppress stale callbacks
                 await self._client.disconnect()
             except Exception:
                 pass
             self._client = None
+            self._apply_state("disconnected", 0, 0)
 
         protocol = params["protocol"]
         host = params["host"]
@@ -734,7 +738,7 @@ class TerminalApp(App[None]):
         if protocol == "serial":
             client: AbstractProjectorClient = SerialClient(host, port)
         elif protocol == "vpnet":
-            client = VpnetClient(host, port)
+            client = VpnetClient(host, port, password=password)
         else:
             client = HttpClient(host, port, password)
 

@@ -22,7 +22,7 @@ def _build_client(
     if protocol == "serial":
         return SerialClient(host, port)
     if protocol == "vpnet":
-        return VpnetClient(host, port)
+        return VpnetClient(host, port, password=password)
     if protocol == "http":
         return HttpClient(host, port, password)
     raise ValueError(f"Unknown protocol: {protocol!r}")
