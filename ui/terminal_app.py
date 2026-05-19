@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from datetime import datetime
-from typing import Optional
+from io import TextIOWrapper
+from typing import IO, Optional
+
+from platformdirs import user_config_dir
+from pathlib import Path
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -386,6 +391,11 @@ class TerminalApp(App[None]):
         border: solid $secondary;
         padding: 0 1;
     }
+    #log-file-label {
+        width: 1fr;
+        height: auto;
+        color: $text-muted;
+    }
     #cmd-log { height: 1fr; }
     """
 
@@ -415,6 +425,7 @@ class TerminalApp(App[None]):
         self._reconnect_attempt: int = 0
         self._cmd_queue: asyncio.Queue = asyncio.Queue()
         self._sending = False
+        self._log_file: Optional[IO[str]] = None
 
     # ------------------------------------------------------------------
     # Compose
@@ -440,6 +451,7 @@ class TerminalApp(App[None]):
                     yield TextArea(id="cmd-input")
             with Vertical(id="log-panel"):
                 yield Label("Command log  [select text to copy]")
+                yield Label("", id="log-file-label")
                 yield TextArea("", read_only=True, id="cmd-log")
         yield Footer()
 
@@ -470,6 +482,12 @@ class TerminalApp(App[None]):
     async def on_unmount(self) -> None:
         if self._client is not None:
             await self._client.disconnect()
+        if self._log_file is not None:
+            try:
+                self._log_file.close()
+            except Exception:
+                pass
+            self._log_file = None
 
     async def _connect_client(self) -> None:
         assert self._client is not None
@@ -486,6 +504,14 @@ class TerminalApp(App[None]):
         self, client: AbstractProjectorClient, params: Optional[dict]
     ) -> None:
         """Store client, wire state callback, update info panel labels."""
+        # Close any previous session log before starting a new one
+        if self._log_file is not None:
+            try:
+                self._log_file.close()
+            except Exception:
+                pass
+            self._log_file = None
+
         self._client = client
         self._client._on_state_change = self._on_state_change
 
@@ -503,6 +529,16 @@ class TerminalApp(App[None]):
             self.query_one("#port-label", Label).update(
                 f"Port:     {params.get('port','?')}"
             )
+            protocol = params.get("protocol", "serial")
+            name = params.get("name", "").strip()
+            slug = name if name else f"{params.get('host','unknown')}-{params.get('port','0')}"
+            log_file = _open_session_log(self, protocol, slug)
+            self._log_file = log_file
+            log_label = self.query_one("#log-file-label", Label)
+            if log_file is not None:
+                log_label.update(f"[dim]{log_file.name}[/dim]")
+            else:
+                log_label.update("")
 
     def _on_state_change(self, state: str, attempt: int, next_retry_s: int) -> None:
         """Called from the client — may be an asyncio task or a background thread."""
@@ -628,6 +664,12 @@ class TerminalApp(App[None]):
         log.insert(text_to_add, location=log.document.end, maintain_selection_offset=True)
         log.read_only = True
         log.scroll_end(animate=False)
+        if self._log_file is not None:
+            try:
+                self._log_file.write(line + "\n")
+                self._log_file.flush()
+            except Exception:
+                self._log_file = None
 
     # ------------------------------------------------------------------
     # History navigation
@@ -709,3 +751,27 @@ class TerminalApp(App[None]):
 def _timestamp() -> str:
     now = datetime.now()
     return now.strftime("%H:%M:%S.") + f"{now.microsecond // 1000:03d}"
+
+
+def _slug(text: str) -> str:
+    """Sanitise text for use in a filename."""
+    return re.sub(r"[^\w.\-]", "-", text).strip("-") or "session"
+
+
+def _open_session_log(app: "TerminalApp", protocol: str, name_or_slug: str) -> Optional[IO[str]]:
+    """Create a new per-session log file; return the open handle or None on error."""
+    logs_dir = Path(user_config_dir("epson_terminal")) / "logs"
+    try:
+        logs_dir.mkdir(parents=True, exist_ok=True)
+    except Exception as exc:
+        app._append_to_log(f"{_timestamp()}  >> Warning: could not create logs directory: {exc}")
+        return None
+    now = datetime.now()
+    date_str = now.strftime("%Y-%m-%dT%H-%M-%S")
+    filename = f"{date_str}_{_slug(protocol)}_{_slug(name_or_slug)}.log"
+    path = logs_dir / filename
+    try:
+        return path.open("a", encoding="utf-8")
+    except Exception as exc:
+        app._append_to_log(f"{_timestamp()}  >> Warning: could not open log file {path}: {exc}")
+        return None
