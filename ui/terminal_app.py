@@ -2,18 +2,20 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal, Vertical, ScrollableContainer
-from textual.screen import ModalScreen
+from textual.containers import Horizontal, Vertical
+from textual.screen import ModalScreen, Screen
 from textual.widgets import (
     Button,
     Footer,
     Header,
     Input,
     Label,
+    ListItem,
+    ListView,
     Select,
     TextArea,
 )
@@ -23,9 +25,7 @@ from client.base import AbstractProjectorClient, ClientNotConnectedError
 from client.serial import SerialClient
 from client.vpnet import VpnetClient
 from client.http import HttpClient
-
-if TYPE_CHECKING:
-    from projector.model import ModelDef
+from client.presets import load_presets, save_preset, delete_preset
 
 _DEFAULT_PORTS: dict[str, int] = {"serial": 12345, "vpnet": 3629, "http": 80}
 _DEFAULT_QUICK_CMDS = ["SNO?", "PWR?", "PWR ON", "PWR OFF", "SOURCE?"]
@@ -38,32 +38,210 @@ _PROTOCOL_LABELS = [
 
 
 # ---------------------------------------------------------------------------
-# Connect dialog
+# Confirm dialog
 # ---------------------------------------------------------------------------
 
-class ConnectDialog(ModalScreen["dict | None"]):
-    """Modal dialog for establishing or switching a projector connection."""
+class ConfirmDialog(ModalScreen[bool]):
+    """Simple yes/no confirmation modal."""
 
     DEFAULT_CSS = """
-    ConnectDialog {
+    ConfirmDialog {
         align: center middle;
     }
-    #connect-dialog {
-        width: 70;
+    #confirm-panel {
+        width: 50;
+        height: auto;
+        border: solid $warning;
+        background: $surface;
+        padding: 1 2;
+    }
+    #confirm-buttons {
+        margin-top: 1;
+        height: auto;
+        align: right middle;
+    }
+    #confirm-buttons Button {
+        margin-left: 1;
+    }
+    """
+
+    def __init__(self, message: str) -> None:
+        super().__init__()
+        self._message = message
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="confirm-panel"):
+            yield Label(self._message, markup=True)
+            with Horizontal(id="confirm-buttons"):
+                yield Button("Cancel", variant="default", id="btn-no")
+                yield Button("Delete", variant="error", id="btn-yes")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.dismiss(event.button.id == "btn-yes")
+
+    def on_key(self, event) -> None:
+        if event.key == "escape":
+            self.dismiss(False)
+            event.stop()
+        elif event.key == "y":
+            self.dismiss(True)
+            event.stop()
+
+
+# ---------------------------------------------------------------------------
+# Preset list screen
+# ---------------------------------------------------------------------------
+
+class PresetListScreen(Screen["dict | None"]):
+    """Main entry screen showing saved presets."""
+
+    DEFAULT_CSS = """
+    PresetListScreen {
+        align: center middle;
+    }
+    #preset-panel {
+        width: 72;
+        height: auto;
+        max-height: 80vh;
+        border: solid $primary;
+        background: $surface;
+        padding: 1 2;
+    }
+    #preset-list {
+        height: auto;
+        max-height: 20;
+        margin-bottom: 1;
+    }
+    #empty-label {
+        color: $text-muted;
+        margin: 1 0;
+    }
+    #preset-hint {
+        color: $text-muted;
+    }
+    """
+
+    BINDINGS = [
+        Binding("n", "new_preset", "New", show=True),
+        Binding("e", "edit_preset", "Edit", show=True),
+        Binding("d", "delete_preset", "Delete", show=True),
+        Binding("ctrl+q", "app.quit", "Quit", show=True),
+        Binding("q", "app.quit", "Quit", show=False),
+    ]
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="preset-panel"):
+            yield Label("[bold]Saved Presets[/bold]", markup=True)
+            yield Label(
+                "No presets saved yet. Press [bold]n[/bold] to add one.",
+                id="empty-label",
+                markup=True,
+            )
+            yield ListView(id="preset-list")
+            yield Label(
+                "[dim]Enter: connect  n: new  e: edit  d: delete  q: quit[/dim]",
+                id="preset-hint",
+                markup=True,
+            )
+
+    def on_mount(self) -> None:
+        self._refresh_list()
+
+    def _refresh_list(self) -> None:
+        presets = load_presets()
+        lv = self.query_one("#preset-list", ListView)
+        empty_label = self.query_one("#empty-label", Label)
+        lv.remove_children()
+        if presets:
+            empty_label.display = False
+            lv.display = True
+            for p in presets:
+                name = p.get("name", "?")
+                proto = p.get("protocol", "?")
+                host = p.get("host", "?")
+                port = p.get("port", "?")
+                item = ListItem(
+                    Label(f"[bold]{name}[/bold]  {proto}  {host}:{port}", markup=True)
+                )
+                item._preset = p  # type: ignore[attr-defined]
+                lv.append(item)
+        else:
+            empty_label.display = True
+            lv.display = False
+
+    def _selected_preset(self) -> Optional[dict]:
+        lv = self.query_one("#preset-list", ListView)
+        child = lv.highlighted_child
+        if child is not None:
+            return getattr(child, "_preset", None)
+        return None
+
+    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        preset = getattr(event.item, "_preset", None)
+        if preset:
+            self.dismiss(preset)
+
+    async def action_new_preset(self) -> None:
+        async def _on_result(params: "dict | None") -> None:
+            if params is not None:
+                self.dismiss(params)
+
+        await self.app.push_screen(ConnectionFormScreen(), _on_result)
+
+    async def action_edit_preset(self) -> None:
+        preset = self._selected_preset()
+        if preset is None:
+            return
+
+        async def _on_result(params: "dict | None") -> None:
+            if params is not None:
+                self.dismiss(params)
+
+        await self.app.push_screen(ConnectionFormScreen(prefill=preset), _on_result)
+
+    async def action_delete_preset(self) -> None:
+        preset = self._selected_preset()
+        if preset is None:
+            return
+        name = preset.get("name", "?")
+
+        async def _on_confirm(confirmed: bool) -> None:
+            if confirmed:
+                delete_preset(name)
+                self._refresh_list()
+
+        await self.app.push_screen(
+            ConfirmDialog(f"Delete preset [bold]{name}[/bold]?"), _on_confirm
+        )
+
+
+# ---------------------------------------------------------------------------
+# Connection form screen
+# ---------------------------------------------------------------------------
+
+class ConnectionFormScreen(Screen["dict | None"]):
+    """Form screen for creating or editing a connection preset."""
+
+    DEFAULT_CSS = """
+    ConnectionFormScreen {
+        align: center middle;
+    }
+    #form-panel {
+        width: 72;
         height: auto;
         border: solid $primary;
         background: $surface;
         padding: 1 2;
     }
-    #connect-dialog Label {
+    #form-panel Label {
         margin-top: 1;
     }
-    #connect-buttons {
+    #form-buttons {
         margin-top: 1;
         height: auto;
         align: right middle;
     }
-    #connect-buttons Button {
+    #form-buttons Button {
         margin-left: 1;
     }
     """
@@ -75,7 +253,13 @@ class ConnectDialog(ModalScreen["dict | None"]):
     def compose(self) -> ComposeResult:
         pre = self._prefill
         proto = pre.get("protocol", "vpnet")
-        with Vertical(id="connect-dialog"):
+        with Vertical(id="form-panel"):
+            yield Label("Name (leave blank to connect without saving):")
+            yield Input(
+                value=pre.get("name", ""),
+                placeholder="e.g. living-room",
+                id="name-input",
+            )
             yield Label("Protocol:")
             yield Select(
                 [(label, val) for label, val in _PROTOCOL_LABELS],
@@ -83,75 +267,75 @@ class ConnectDialog(ModalScreen["dict | None"]):
                 id="proto-select",
             )
             yield Label("Host:")
-            yield Input(value=pre.get("host", ""), placeholder="192.168.1.50", id="host-input")
+            yield Input(
+                value=pre.get("host", ""),
+                placeholder="192.168.1.50",
+                id="host-input",
+            )
             yield Label("Port:")
             yield Input(
                 value=str(pre.get("port", _DEFAULT_PORTS[proto])),
                 placeholder="port",
                 id="port-input",
             )
-            yield Label("Password (HTTP only):")
+            yield Label("Password (HTTP only):", id="password-label")
             yield Input(
                 value=pre.get("password", ""),
                 placeholder="leave blank if not required",
                 password=True,
                 id="password-input",
             )
-            yield Label("Model path (optional):")
-            yield Input(
-                value=pre.get("model_path", ""),
-                placeholder="models/eh_tw3200.yaml",
-                id="model-input",
-            )
-            with Horizontal(id="connect-buttons"):
-                yield Button("Cancel", variant="default", id="btn-cancel")
+            with Horizontal(id="form-buttons"):
+                yield Button("Back", variant="default", id="btn-back")
+                yield Button("Connect without saving", variant="default", id="btn-nosave")
                 yield Button("Connect", variant="primary", id="btn-connect")
 
     def on_mount(self) -> None:
-        self.query_one("#host-input", Input).focus()
+        self.query_one("#name-input", Input).focus()
         self._update_password_visibility()
 
     def on_select_changed(self, event: Select.Changed) -> None:
         if event.select.id == "proto-select":
             proto = str(event.value)
-            port_input = self.query_one("#port-input", Input)
-            port_input.value = str(_DEFAULT_PORTS.get(proto, 80))
+            self.query_one("#port-input", Input).value = str(_DEFAULT_PORTS.get(proto, 80))
             self._update_password_visibility()
 
     def _update_password_visibility(self) -> None:
         proto = str(self.query_one("#proto-select", Select).value)
-        pw_label = self.query("Label")[-2]  # "Password (HTTP only):" label
-        pw_input = self.query_one("#password-input", Input)
-        pw_label.display = proto == "http"
-        pw_input.display = proto == "http"
+        visible = proto == "http"
+        self.query_one("#password-label", Label).display = visible
+        self.query_one("#password-input", Input).display = visible
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "btn-cancel":
+        if event.button.id == "btn-back":
             self.dismiss(None)
+        elif event.button.id == "btn-nosave":
+            self._submit(save=False)
         elif event.button.id == "btn-connect":
-            self._submit()
+            self._submit(save=True)
 
     def on_key(self, event) -> None:
         if event.key == "escape":
             self.dismiss(None)
             event.stop()
 
-    def _submit(self) -> None:
+    def _submit(self, save: bool) -> None:
         proto = str(self.query_one("#proto-select", Select).value)
+        name = self.query_one("#name-input", Input).value.strip()
         host = self.query_one("#host-input", Input).value.strip()
         port_str = self.query_one("#port-input", Input).value.strip()
         password = self.query_one("#password-input", Input).value
-        model_path = self.query_one("#model-input", Input).value.strip()
         try:
             port = int(port_str)
         except ValueError:
             port = _DEFAULT_PORTS.get(proto, 80)
         self.dismiss({
+            "name": name,
             "protocol": proto,
             "host": host,
             "port": port,
             "password": password,
-            "model_path": model_path or None,
+            "save": save and bool(name),
         })
 
 
@@ -196,7 +380,6 @@ class TerminalApp(App[None]):
     }
     #input-panel Label { height: 1; }
     TextArea { height: 1fr; }
-    #hint-label { height: 1; color: $text-muted; }
 
     #log-panel {
         width: 1fr;
@@ -220,12 +403,10 @@ class TerminalApp(App[None]):
     def __init__(
         self,
         client: Optional[AbstractProjectorClient] = None,
-        model: Optional["ModelDef"] = None,
         initial_params: Optional[dict] = None,
     ) -> None:
         super().__init__()
         self._client = client
-        self._model = model
         self._initial_params = initial_params or {}
         self._history: list[str] = []
         self._history_idx: int = -1
@@ -245,6 +426,7 @@ class TerminalApp(App[None]):
             with Vertical(id="left-col"):
                 with Vertical(id="info-panel"):
                     yield Label("Connection", markup=True)
+                    yield Label("", id="preset-name-label")
                     yield Label("", id="proto-label")
                     yield Label("", id="host-label")
                     yield Label("", id="port-label")
@@ -256,7 +438,6 @@ class TerminalApp(App[None]):
                 with Vertical(id="input-panel"):
                     yield Label("[Ctrl+S] send  [↑/↓] history")
                     yield TextArea(id="cmd-input")
-                    yield Label("", id="hint-label")
             with Vertical(id="log-panel"):
                 yield Label("Command log  [select text to copy]")
                 yield TextArea("", read_only=True, id="cmd-log")
@@ -272,7 +453,19 @@ class TerminalApp(App[None]):
             self._attach_client(self._client, self._initial_params)
             asyncio.create_task(self._connect_client())
         else:
-            self.call_after_refresh(self.action_open_connect)
+            await self._push_connect_screen()
+
+    async def _push_connect_screen(self) -> None:
+        async def _on_result(params: "dict | None") -> None:
+            if params is None:
+                return
+            await self._apply_new_connection(params)
+
+        presets = load_presets()
+        if presets:
+            await self.push_screen(PresetListScreen(), _on_result)
+        else:
+            await self.push_screen(ConnectionFormScreen(), _on_result)
 
     async def on_unmount(self) -> None:
         if self._client is not None:
@@ -297,6 +490,10 @@ class TerminalApp(App[None]):
         self._client._on_state_change = self._on_state_change
 
         if params:
+            name = params.get("name", "")
+            self.query_one("#preset-name-label", Label).update(
+                f"Preset:   [bold]{name}[/bold]" if name else ""
+            )
             self.query_one("#proto-label", Label).update(
                 f"Protocol: [bold]{params.get('protocol','?')}[/bold]"
             )
@@ -355,14 +552,7 @@ class TerminalApp(App[None]):
     def _populate_quick_commands(self) -> None:
         container = self.query_one("#quick-buttons")
         container.remove_children()
-        if self._model is not None:
-            cmds = [
-                cmd for cmd, defn in self._model.commands.items() if defn.readable
-            ]
-            cmds = sorted(cmds)
-        else:
-            cmds = _DEFAULT_QUICK_CMDS
-        for cmd in cmds:
+        for cmd in _DEFAULT_QUICK_CMDS:
             btn = Button(cmd, id=f"qcmd-{cmd.replace(' ', '_').replace('?', 'Q')}")
             btn.tooltip = cmd
             container.mount(btn)
@@ -465,69 +655,23 @@ class TerminalApp(App[None]):
             event.stop()
 
     # ------------------------------------------------------------------
-    # Model hints
-    # ------------------------------------------------------------------
-
-    async def on_text_area_changed(self, event: TextArea.Changed) -> None:
-        if event.text_area.id != "cmd-input":
-            return
-        if self._model is None:
-            return
-        text = event.text_area.text
-        # Get the line under the cursor
-        lines = text.split("\n")
-        # Use current cursor row
-        row = event.text_area.cursor_location[0]
-        current_line = lines[row] if row < len(lines) else ""
-        self._update_hint(current_line)
-
-    def _update_hint(self, line: str) -> None:
-        hint_label = self.query_one("#hint-label", Label)
-        if self._model is None:
-            hint_label.update("")
-            return
-        parts = line.strip().split(" ", 1)
-        cmd_name = parts[0].rstrip("?").upper() if parts else ""
-        if not cmd_name:
-            hint_label.update("")
-            return
-        cmd_def = self._model.commands.get(cmd_name)
-        if cmd_def is None:
-            hint_label.update(f"[yellow]Unknown command: {cmd_name}[/yellow]")
-            return
-        # Only show hints when a space has been typed after the command name
-        if len(parts) < 2 and not line.strip().endswith(" "):
-            hint_label.update("")
-            return
-        hints = []
-        if cmd_def.range:
-            hints.append(f"range: {cmd_def.range[0]}–{cmd_def.range[1]}")
-        if cmd_def.set_values:
-            hints.append(f"values: {', '.join(cmd_def.set_values)}")
-        elif cmd_def.set_map:
-            hints.append(f"values: {', '.join(cmd_def.set_map.keys())}")
-        if hints:
-            hint_label.update(f"[dim]{cmd_name} — {'; '.join(hints)}[/dim]")
-        else:
-            hint_label.update("")
-
-    # ------------------------------------------------------------------
-    # Connect dialog
+    # Connect screens
     # ------------------------------------------------------------------
 
     async def action_open_connect(self) -> None:
-        prefill = self._initial_params.copy() if self._initial_params else {}
-        if self._model:
-            prefill.setdefault("model_path", "")
-
-        async def _on_result(result: "dict | None") -> None:
-            if result is None:
-                return
-            await self._apply_new_connection(result)
-
-        await self.push_screen(ConnectDialog(prefill=prefill), _on_result)
+        await self._push_connect_screen()
 
     async def _apply_new_connection(self, params: dict) -> None:
+        # Save preset if requested
+        if params.get("save") and params.get("name"):
+            save_preset({
+                "name": params["name"],
+                "protocol": params["protocol"],
+                "host": params["host"],
+                "port": params["port"],
+                "password": params.get("password", ""),
+            })
+
         # Close existing connection
         if self._client is not None:
             try:
@@ -535,15 +679,6 @@ class TerminalApp(App[None]):
             except Exception:
                 pass
             self._client = None
-
-        # Optionally load a new model
-        if params.get("model_path"):
-            try:
-                from projector.model import load_model
-                self._model = load_model(params["model_path"])
-                self._populate_quick_commands()
-            except Exception as exc:
-                self._log_system(f"Model load failed: {exc}")
 
         protocol = params["protocol"]
         host = params["host"]
