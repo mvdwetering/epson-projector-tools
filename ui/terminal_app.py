@@ -134,6 +134,10 @@ class PresetListScreen(Screen["dict | None"]):
         Binding("q", "app.quit", "Quit", show=False),
     ]
 
+    def __init__(self, initial_preset_name: Optional[str] = None) -> None:
+        super().__init__()
+        self._initial_preset_name = initial_preset_name
+
     def compose(self) -> ComposeResult:
         with Vertical(id="preset-panel"):
             yield Label("[bold]Saved Presets[/bold]", markup=True)
@@ -170,6 +174,11 @@ class PresetListScreen(Screen["dict | None"]):
                 )
                 item._preset = p  # type: ignore[attr-defined]
                 lv.append(item)
+            if self._initial_preset_name:
+                for idx, child in enumerate(lv._nodes):
+                    if getattr(child, "_preset", {}).get("name") == self._initial_preset_name:
+                        lv.index = idx
+                        break
         else:
             empty_label.display = True
             lv.display = False
@@ -292,8 +301,8 @@ class ConnectionFormScreen(Screen["dict | None"]):
             )
             with Horizontal(id="form-buttons"):
                 yield Button("Back", variant="default", id="btn-back")
-                yield Button("Connect without saving", variant="default", id="btn-nosave")
-                yield Button("Connect", variant="primary", id="btn-connect")
+                yield Button("Connect", variant="default", id="btn-nosave")
+                yield Button("Connect & Save", variant="primary", id="btn-connect")
 
     def on_mount(self) -> None:
         self.query_one("#name-input", Input).focus()
@@ -367,7 +376,6 @@ class TerminalApp(App[None]):
         padding: 0 1;
     }
     #info-panel Label { height: 1; }
-    #status-label { color: $success; }
 
     #quick-panel {
         height: auto;
@@ -426,6 +434,7 @@ class TerminalApp(App[None]):
         self._cmd_queue: asyncio.Queue = asyncio.Queue()
         self._sending = False
         self._log_file: Optional[IO[str]] = None
+        self._active_preset_name: Optional[str] = None
 
     # ------------------------------------------------------------------
     # Compose
@@ -436,12 +445,10 @@ class TerminalApp(App[None]):
         with Horizontal(id="panels"):
             with Vertical(id="left-col"):
                 with Vertical(id="info-panel"):
-                    yield Label("Connection", markup=True)
+                    yield Label("Connection  [red]Disconnected[/red]", id="connection-header-label", markup=True)
                     yield Label("", id="preset-name-label")
                     yield Label("", id="proto-label")
                     yield Label("", id="host-label")
-                    yield Label("", id="port-label")
-                    yield Label("Disconnected", id="status-label")
                 with Vertical(id="quick-panel"):
                     yield Label("Quick commands")
                     with Horizontal(id="quick-buttons"):
@@ -475,7 +482,7 @@ class TerminalApp(App[None]):
 
         presets = load_presets()
         if presets:
-            await self.push_screen(PresetListScreen(), _on_result)
+            await self.push_screen(PresetListScreen(initial_preset_name=self._active_preset_name), _on_result)
         else:
             await self.push_screen(ConnectionFormScreen(), _on_result)
 
@@ -517,6 +524,7 @@ class TerminalApp(App[None]):
 
         if params:
             name = params.get("name", "")
+            self._active_preset_name = name if name else None
             self.query_one("#preset-name-label", Label).update(
                 f"Preset:   [bold]{name}[/bold]" if name else ""
             )
@@ -524,10 +532,7 @@ class TerminalApp(App[None]):
                 f"Protocol: [bold]{params.get('protocol','?')}[/bold]"
             )
             self.query_one("#host-label", Label).update(
-                f"Host:     {params.get('host','?')}"
-            )
-            self.query_one("#port-label", Label).update(
-                f"Port:     {params.get('port','?')}"
+                f"Host:     {params.get('host','?')}:{params.get('port','?')}"
             )
             protocol = params.get("protocol", "serial")
             name = params.get("name", "").strip()
@@ -551,22 +556,22 @@ class TerminalApp(App[None]):
             self.call_from_thread(self._apply_state, state, attempt, next_retry_s)
 
     def _apply_state(self, state: str, attempt: int, next_retry_s: int) -> None:
-        status_label = self.query_one("#status-label", Label)
+        header_label = self.query_one("#connection-header-label", Label)
         if self._reconnect_countdown_timer is not None:
             self._reconnect_countdown_timer.stop()
             self._reconnect_countdown_timer = None
 
         if state == "connected":
-            status_label.update("[green]Connected[/green]")
+            header_label.update("Connection  [green]Connected[/green]")
             self._log_system("Connected")
         elif state == "disconnected":
-            status_label.update("[red]Disconnected[/red]")
+            header_label.update("Connection  [red]Disconnected[/red]")
             self._log_system("Disconnected")
         elif state == "reconnecting":
             self._reconnect_next_s = next_retry_s
             self._reconnect_attempt = attempt
-            status_label.update(
-                f"[yellow]Reconnecting… {next_retry_s}s[/yellow]"
+            header_label.update(
+                f"Connection  [yellow]Reconnecting\u2026 {next_retry_s}s[/yellow]"
             )
             self._reconnect_countdown_timer = self.set_interval(
                 1.0, self._tick_reconnect_countdown
@@ -575,8 +580,8 @@ class TerminalApp(App[None]):
     def _tick_reconnect_countdown(self) -> None:
         if self._reconnect_next_s > 1:
             self._reconnect_next_s -= 1
-            self.query_one("#status-label", Label).update(
-                f"[yellow]Reconnecting… {self._reconnect_next_s}s[/yellow]"
+            self.query_one("#connection-header-label", Label).update(
+                f"Connection  [yellow]Reconnecting\u2026 {self._reconnect_next_s}s[/yellow]"
             )
         else:
             if self._reconnect_countdown_timer:
