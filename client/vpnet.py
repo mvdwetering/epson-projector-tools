@@ -14,14 +14,13 @@ logger = logging.getLogger(__name__)
 # ESC/VP.net protocol constants (must match transports/vpnet.py)
 _MAGIC = b"ESC/VP.net"
 _VERSION = 0x10
-_TYPE_HELLO = 0x01
 _TYPE_CONNECT = 0x03
 _STATUS_OK = 0x20
 _HEADER_SIZE = 16  # 10 (magic) + 1 (ver) + 1 (type) + 2 (reserved) + 1 (status) + 1 (num_headers)
 
 
 def _make_packet(pkt_type: int) -> bytes:
-    return _MAGIC + struct.pack("BBHBb", _VERSION, pkt_type, 0, 0x00, 0)
+    return _MAGIC + struct.pack("BBHBB", _VERSION, pkt_type, 0, 0x00, 0)
 
 
 class VpnetClient(AbstractProjectorClient):
@@ -129,14 +128,9 @@ class VpnetClient(AbstractProjectorClient):
         self._notify("connected")
 
     async def _handshake(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
-        # Send HELLO
-        writer.write(_make_packet(_TYPE_HELLO))
-        await writer.drain()
-        # Read HELLO response
-        hello_resp = await reader.readexactly(_HEADER_SIZE)
-        if hello_resp[:10] != _MAGIC or hello_resp[14] != _STATUS_OK:
-            raise ConnectionError("HELLO response not OK")
-        # Send CONNECT (with password header if configured)
+        # TCP session mode starts directly with CONNECT (spec §5.6).
+        # HELLO is session-less UDP discovery only and MUST NOT be sent over TCP
+        # (spec §5.7 — projector returns 0x45 "Request not allowed").
         writer.write(self._make_connect_packet())
         await writer.drain()
         # Read CONNECT response
@@ -156,7 +150,7 @@ class VpnetClient(AbstractProjectorClient):
         if not self._password:
             return _make_packet(_TYPE_CONNECT)
         pw_bytes = self._password.encode("ascii")[:16].ljust(16, b"\x00")
-        base = _MAGIC + struct.pack("BBHBb", _VERSION, _TYPE_CONNECT, 0, 0x00, 1)
+        base = _MAGIC + struct.pack("BBHBB", _VERSION, _TYPE_CONNECT, 0, 0x00, 1)
         extra = bytes([0x01, 0x01]) + pw_bytes  # id=Password, attr=Plain, 16 bytes
         return base + extra
 

@@ -25,7 +25,7 @@ _EXTRA_HEADER_SIZE = 18
 
 
 def _make_packet(pkt_type: int, status: int, num_headers: int = 0) -> bytes:
-    return _MAGIC + struct.pack("BBHBb", _VERSION, pkt_type, 0, status, num_headers)
+    return _MAGIC + struct.pack("BBHBB", _VERSION, pkt_type, 0, status, num_headers)
 
 
 class VpnetTransport(BaseTransport):
@@ -80,16 +80,14 @@ class VpnetTransport(BaseTransport):
 
         pkt_type = header[11]
 
-        # Optional HELLO exchange
+        # HELLO is session-less UDP discovery only (spec §5.5/§5.7).
+        # Reject with 0x45 "Request not allowed" if received over TCP.
         if pkt_type == _TYPE_HELLO:
             await self._skip_extra_headers(reader, header[15])
-            writer.write(_make_packet(_TYPE_HELLO, _STATUS_OK))
+            writer.write(_make_packet(_TYPE_HELLO, 0x45))  # Request not allowed
             await writer.drain()
-            # Read next packet (expected: CONNECT)
-            header = await reader.readexactly(_HEADER_SIZE)
-            if header[:10] != _MAGIC:
-                return False
-            pkt_type = header[11]
+            logger.warning("vpnet: rejected HELLO on TCP (spec §5.7 violation)")
+            return False
 
         if pkt_type != _TYPE_CONNECT:
             logger.warning("vpnet: expected CONNECT (0x03), got 0x%02x", pkt_type)
