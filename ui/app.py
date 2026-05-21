@@ -165,7 +165,8 @@ class EmulatorApp(App[None]):
         log: RichLog = self.query_one("#cmd-log", RichLog)
         while True:
             transport, cmd, response = await self._cmd_queue.get()
-            ts = datetime.now().strftime("%H:%M:%S")
+            now = datetime.now()
+            ts = now.strftime("%H:%M:%S.") + f"{now.microsecond // 1000:03d}"
             display_cmd = cmd if cmd else "(null)"
             ok = "✓" if response != "ERR\r:" else "[red]✗[/red]"
             log.write(

@@ -12,11 +12,15 @@ The TUI SHALL display a panel showing current values for all projector commands 
 - **THEN** the TUI state panel updates to show the new value within one UI refresh cycle
 
 ### Requirement: Display recent command log
-The TUI SHALL display a scrollable log of the most recent ESC/VP21 commands received (across all transports) with timestamps and the transport they arrived on.
+The TUI SHALL display a scrollable log of the most recent ESC/VP21 commands received (across all transports) with timestamps formatted as `HH:MM:SS.mmm` and the transport they arrived on.
 
 #### Scenario: Command logged on receipt
 - **WHEN** any transport receives a command
-- **THEN** the command, transport name, and timestamp appear in the log
+- **THEN** the command, transport name, and millisecond-precision timestamp appear in the log
+
+#### Scenario: Closely spaced commands remain distinguishable
+- **WHEN** multiple commands are received within the same second
+- **THEN** their log entries preserve millisecond precision so operators can distinguish the event order within that second
 
 ### Requirement: Interactive power control
 The TUI SHALL provide a keyboard shortcut or button to toggle projector power (PWR ON / PWR OFF) directly from the UI.
