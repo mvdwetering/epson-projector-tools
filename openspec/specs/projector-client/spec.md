@@ -58,9 +58,17 @@ The system SHALL provide an `HttpClient` that sends ESC/VP21 GET commands to `/c
 - **WHEN** the server returns `{"projector": {"feature": {"reply": "ERR", "error": true}}}`
 - **THEN** `send()` returns `"ERR\r:"`
 
-#### Scenario: HTTP is always "connected"
+#### Scenario: HTTP connect validates auth with null probe
+- **WHEN** `connect()` is called on an `HttpClient`
+- **THEN** the client sends `GET /cgi-bin/directsend?=` with Digest auth and `Referer` headers, and treats HTTP 200 as successful connection
+
+#### Scenario: HTTP connect fails on wrong password
+- **WHEN** `connect()` is called with invalid Digest credentials
+- **THEN** the null probe request returns HTTP 401 and `connect()` raises a connection error instead of reporting connected
+
+#### Scenario: HTTP connected property reflects connect/disconnect lifecycle
 - **WHEN** `connected` is queried on an `HttpClient`
-- **THEN** it always returns `True` (HTTP is stateless; connection state is not tracked)
+- **THEN** it is `True` only after successful `connect()` and `False` after `disconnect()`
 
 ---
 

@@ -43,6 +43,7 @@ class HttpClient(AbstractProjectorClient):
         self._port = port
         self._password = password
         self._session: Optional[aiohttp.ClientSession] = None
+        self._connected = False
 
     def _base_url(self) -> str:
         if self._port == 80:
@@ -56,9 +57,10 @@ class HttpClient(AbstractProjectorClient):
         return {"Referer": self._referer()}
 
     async def connect(self) -> None:
-        """Probe host:port reachability, then create the aiohttp session."""
+        """Probe host:port and auth by issuing an HTTP null command."""
         if self._session and not self._session.closed:
             await self._session.close()
+        self._connected = False
         # Verify the TCP port is open before reporting connected.
         try:
             _, writer = await asyncio.wait_for(
@@ -76,6 +78,13 @@ class HttpClient(AbstractProjectorClient):
                 aiohttp.DigestAuthMiddleware(login="EPSONWEB", password=self._password)
             )
         self._session = aiohttp.ClientSession(middlewares=middlewares)
+        try:
+            await self._probe_null_command()
+        except Exception:
+            await self._session.close()
+            self._session = None
+            raise
+        self._connected = True
         self._notify("connected")
 
     async def disconnect(self) -> None:
@@ -83,7 +92,22 @@ class HttpClient(AbstractProjectorClient):
         if self._session and not self._session.closed:
             await self._session.close()
         self._session = None
+        self._connected = False
         self._notify("disconnected")
+
+    async def _probe_null_command(self) -> None:
+        """Validate auth/session using Epson's directsend null probe (`?=`)."""
+        assert self._session is not None
+        url = f"{self._base_url()}/cgi-bin/directsend?="
+        try:
+            async with self._session.get(url, headers=self._headers()) as resp:
+                if resp.status == 200:
+                    return
+                if resp.status == 401:
+                    raise ConnectionError("HTTP authentication failed (401 Unauthorized)")
+                raise ConnectionError(f"HTTP null probe failed with status {resp.status}")
+        except aiohttp.ClientError as exc:
+            raise ConnectionError(f"HTTP null probe request failed: {exc}") from exc
 
     async def send(self, cmd: str) -> tuple[str, float]:
         """Send an ESC/VP21 command via HTTP and return (response, duration_ms)."""
@@ -135,8 +159,8 @@ class HttpClient(AbstractProjectorClient):
 
     @property
     def connected(self) -> bool:
-        """HTTP is stateless -- always report as connected."""
-        return True
+        """True only after connect() succeeded and before disconnect()."""
+        return self._connected
 
     @staticmethod
     def _parse_json_response(cmd_name: str, data: dict) -> str:

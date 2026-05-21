@@ -119,9 +119,24 @@ GET /cgi-bin/directsend?CMODE=15
 GET /cgi-bin/directsend?ASPECT=00
 ```
 
-### Response
+### Response (directsend)
 
 HTTP 200. The response is empty based on captures from the web interface.
+
+### Null probe (auth/connect check)
+
+Real projectors also accept an empty directsend query:
+
+```text
+GET /cgi-bin/directsend?=
+```
+
+Observed behavior:
+
+- HTTP 200 with valid Digest credentials
+- HTTP 401 with invalid Digest credentials
+
+This makes `/cgi-bin/directsend?=` useful as an HTTP null command for connection/auth validation without sending a real projector command.
 
 ## Authentication
 
@@ -137,9 +152,9 @@ This seems to be the minimal required to have a command succeed.
 
 Key points:
 
-* Use referrer header
-* Use digest authentication
-* Quote the URL to avoid issues with the `?` at the end
+- Use referrer header
+- Use digest authentication
+- Quote the URL to avoid issues with the `?` at the end
 
 ```bash
 curl --digest --user EPSONWEB:password -H 'Referer: http://192.168.178.46/cgi-bin/webconf' "http://192.168.178.46/cgi-bin/json_query?jsoncallback=PWR?"
