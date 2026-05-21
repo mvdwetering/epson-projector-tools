@@ -144,6 +144,44 @@ escvpnet_proto.experts = {
 -- to "data".  UDP HELLO conversations never see a CONNECT response, so they
 -- permanently remain in "handshake" phase.
 local stream_phases = {}
+local inferred_frames = {}
+
+-- ─── Mid-session ESC/VP21 heuristic ──────────────────────────────────────────
+
+--- Return true when `tvb` looks like an ESC/VP21 command or response.
+---
+--- ESC/VP21 text frames have one of three forms (CR-terminated):
+---   CMD?\r          — query
+---   CMD VALUE\r     — set / action
+---   CMD=VALUE\r     — projector response
+---
+--- The heuristic requires:
+---   • First byte is an uppercase ASCII letter (A–Z)
+---   • All bytes are printable ASCII or space (0x20–0x7E) until the CR
+---   • The frame ends with a carriage-return byte (0x0D)
+---
+--- Binary ESC/VP.net handshake packets begin with "ESC/VP.net" (magic already
+--- checked before this function is called) or with non-uppercase bytes, so
+--- false positives are negligible on port 3629.
+local function is_escvp21_payload(tvb)
+    local len = tvb:len()
+    if len < 3 then return false end          -- need at least "X?\r"
+
+    -- First byte must be uppercase ASCII (A=0x41, Z=0x5A)
+    local first = tvb(0, 1):uint()
+    if first < 0x41 or first > 0x5A then return false end
+
+    -- Last byte must be CR (0x0D)
+    if tvb(len - 1, 1):uint() ~= 0x0D then return false end
+
+    -- All intermediate bytes must be printable ASCII or space (0x20–0x7E)
+    for i = 1, len - 2 do
+        local b = tvb(i, 1):uint()
+        if b < 0x20 or b > 0x7E then return false end
+    end
+
+    return true
+end
 
 -- ─── Extension header parser ────────────────────────────────────────────────────────────────
 
@@ -264,16 +302,35 @@ function escvpnet_proto.dissector(tvb, pinfo, root)
         -- Reset and fall through to handshake parsing.
         if tvb:len() >= MAGIC_LEN and tvb(0, MAGIC_LEN):string() == MAGIC then
             stream_phases[conv_key] = nil
+            inferred_frames[conv_key] = nil
             phase = "handshake"
         else
             local tree = root:add(escvpnet_proto, tvb(), "ESC/VP.net (ESC/VP21 data)")
             tree:add(pf.escvp21_data, tvb(0, tvb:len()))
-            pinfo.cols.info:set("ESC/VP21 data")
+            if inferred_frames[conv_key] == pinfo.number then
+                pinfo.cols.info:set("ESC/VP21 data [session inferred]")
+            else
+                pinfo.cols.info:set("ESC/VP21 data")
+            end
             return tvb:len()
         end
     end
 
     -- ── Handshake phase: 16-byte binary header ────────────────────────────────
+
+    -- Mid-session heuristic: if the payload has no ESC/VP.net magic but looks
+    -- like an ESC/VP21 command, the handshake was completed before this capture
+    -- started.  Promote to data phase and decode as ESC/VP21 text.
+    if (tvb:len() < MAGIC_LEN or tvb(0, MAGIC_LEN):string() ~= MAGIC)
+            and is_escvp21_payload(tvb) then
+        stream_phases[conv_key] = "data"
+        inferred_frames[conv_key] = pinfo.number
+        local tree = root:add(escvpnet_proto, tvb(), "ESC/VP.net (ESC/VP21 data)")
+        tree:add(pf.escvp21_data, tvb(0, tvb:len()))
+        pinfo.cols.info:set("ESC/VP21 data [session inferred]")
+        return tvb:len()
+    end
+
     local tree = root:add(escvpnet_proto, tvb(), "ESC/VP.net")
     local type_val, status_val, num_hdrs = parse_header(tvb, pinfo, tree)
 
@@ -311,6 +368,7 @@ function escvpnet_proto.dissector(tvb, pinfo, root)
     -- ESC/VP21 ASCII commands.  UDP HELLO conversations never trigger this.
     if type_val == 0x03 and status_val == 0x20 then
         stream_phases[conv_key] = "data"
+        inferred_frames[conv_key] = nil
     end
 
     return tvb:len()
