@@ -17,7 +17,7 @@ from projector.state import ProjectorState
 from transports.serial import SerialTransport
 from transports.vpnet import VpnetTransport
 from transports.http import HttpTransport, PasswordStore
-from ui.app import EmulatorApp
+from ui.app import EmulatorApp, EmulatorRuntimeConfig
 
 
 def main() -> None:
@@ -76,6 +76,13 @@ def main() -> None:
     state = ProjectorState(model)
 
     password_store = PasswordStore("emulatorpassword") if args.password else None
+    runtime_config = EmulatorRuntimeConfig(
+        serial_port=args.serial_port,
+        vpnet_port=args.vpnet_port,
+        http_port=args.http_port,
+        vpnet_auth_required=password_store is not None,
+        http_auth_required=password_store is not None,
+    )
 
     transports = [
         SerialTransport(state, model, host=args.host, port=args.serial_port),
@@ -83,7 +90,13 @@ def main() -> None:
         HttpTransport(state, model, host=args.host, port=args.http_port, password=password_store),
     ]
 
-    app = EmulatorApp(state=state, model=model, transports=transports, password_store=password_store)
+    app = EmulatorApp(
+        state=state,
+        model=model,
+        transports=transports,
+        runtime_config=runtime_config,
+        password_store=password_store,
+    )
     app.run()
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -17,6 +18,15 @@ from projector.state import ProjectorState
 if TYPE_CHECKING:
     from transports.base import BaseTransport
     from transports.http import PasswordStore
+
+
+@dataclass(frozen=True)
+class EmulatorRuntimeConfig:
+    serial_port: int
+    vpnet_port: int
+    http_port: int
+    vpnet_auth_required: bool
+    http_auth_required: bool
 
 
 class ChangePasswordScreen(ModalScreen["str | None"]):
@@ -69,10 +79,20 @@ class EmulatorApp(App[None]):
     #panels {
         height: 1fr;
     }
-    #state-panel {
+    #left-panel {
         width: 40;
+        height: 1fr;
+    }
+    #state-table {
+        height: 1fr;
         border: solid $primary;
         padding: 0 1;
+    }
+    #config-table {
+        height: auto;
+        border: solid $accent;
+        padding: 0 1;
+        margin-bottom: 1;
     }
     #log-panel {
         width: 1fr;
@@ -98,12 +118,14 @@ class EmulatorApp(App[None]):
         state: ProjectorState,
         model: ModelDef,
         transports: list["BaseTransport"],
+        runtime_config: EmulatorRuntimeConfig,
         password_store: "PasswordStore | None" = None,
     ) -> None:
         super().__init__()
         self._state = state
         self._model = model
         self._transports = transports
+        self._runtime_config = runtime_config
         self._password_store = password_store
         self._state_queue: asyncio.Queue[tuple[str, str]] = asyncio.Queue()
         self._cmd_queue: asyncio.Queue[tuple[str, str, str]] = asyncio.Queue()
@@ -115,7 +137,9 @@ class EmulatorApp(App[None]):
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Horizontal(id="panels"):
-            yield DataTable(id="state-table", show_cursor=False)
+            with Vertical(id="left-panel"):
+                yield DataTable(id="config-table", show_cursor=False, show_header=False)
+                yield DataTable(id="state-table", show_cursor=False)
             yield RichLog(id="cmd-log", markup=True, max_lines=500)
         yield Footer()
 
@@ -126,6 +150,7 @@ class EmulatorApp(App[None]):
     async def on_mount(self) -> None:
         self.title = f"Epson Emulator — {self._model.name}"
         self._build_state_table()
+        self._build_config_table()
         self._register_observers()
 
         for transport in self._transports:
@@ -136,10 +161,33 @@ class EmulatorApp(App[None]):
 
     def _build_state_table(self) -> None:
         table: DataTable = self.query_one("#state-table", DataTable)
-        table.add_column("Command", key="command", width=14)
-        table.add_column("Value", key="value", width=20)
+        table.add_column("Command", key="command", width=11)
+        table.add_column("Value", key="value", width=11)
         for cmd, value in self._state.all_values().items():
             table.add_row(cmd, value, key=cmd)
+
+    def _build_config_table(self) -> None:
+        table: DataTable = self.query_one("#config-table", DataTable)
+        table.add_column("", key="line", width=32)
+        vpnet_auth_icon = "🔒" if self._runtime_config.vpnet_auth_required else "🔓"
+        http_auth_icon = "🔒" if self._runtime_config.http_auth_required else "🔓"
+
+        def cfg_line(name: str, port: int, icon: str | None = None) -> str:
+            base = f"{name:<10} {port:>5}"
+            return f"{base} {icon}" if icon else base
+
+        table.add_row(
+            cfg_line("Serial TCP", self._runtime_config.serial_port),
+            key="serial",
+        )
+        table.add_row(
+            cfg_line("ESC/VP.net", self._runtime_config.vpnet_port, vpnet_auth_icon),
+            key="vpnet",
+        )
+        table.add_row(
+            cfg_line("HTTP", self._runtime_config.http_port, http_auth_icon),
+            key="http",
+        )
 
     def _register_observers(self) -> None:
         self._state.add_state_observer(
