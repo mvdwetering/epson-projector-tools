@@ -1,3 +1,7 @@
+## Purpose
+
+Define expected behavior for the ESC/VP.net Wireshark dissector, including header decoding, validation, and ESC/VP21 payload presentation.
+## Requirements
 ### Requirement: Dissector registers on ESC/VP.net TCP port
 The dissector SHALL register itself with Wireshark on TCP port 3629 and SHALL also be available via "Decode As" for any TCP stream.
 
@@ -12,17 +16,17 @@ The dissector SHALL register itself with Wireshark on TCP port 3629 and SHALL al
 ---
 
 ### Requirement: Magic prefix validation
-The dissector SHALL verify that each handshake packet begins with the 10-byte ASCII string `ESC/VP.net` before decoding further fields. If the magic is absent the dissector SHALL pass the bytes to the default data dissector.
+The dissector SHALL verify that packets decoded as ESC/VP.net begin with the 10-byte ASCII string `ESC/VP.net` before decoding further fields.
+
+If the magic is absent, the dissector SHALL decode the payload as ESC/VP21 data instead of passing bytes to the default data dissector.
 
 #### Scenario: Valid magic accepted
 - **WHEN** the first 10 bytes of a packet equal `45 53 43 2F 56 50 2E 6E 65 74` (`ESC/VP.net`)
-- **THEN** the dissector decodes the remaining header fields
+- **THEN** the dissector decodes the remaining ESC/VP.net fields
 
-#### Scenario: Invalid magic rejected
+#### Scenario: Invalid magic falls back to ESC/VP21
 - **WHEN** the first 10 bytes do not match `ESC/VP.net`
-- **THEN** the dissector labels the packet as `[Unknown / non-ESC/VP.net data]` and does not parse further
-
----
+- **THEN** the packet is shown as `ESC/VP21 data`
 
 ### Requirement: 16-byte header field decoding
 The dissector SHALL decode all fields of the 16-byte ESC/VP.net header and display them as named fields in the Wireshark packet detail pane.
@@ -89,59 +93,6 @@ Defined statuses (per specification):
 
 ---
 
-### Requirement: Per-stream phase tracking
-The dissector SHALL maintain per-conversation state to detect when the ESC/VP.net handshake is complete and the stream has entered ESC/VP21 data mode.
-
-The handshake is considered complete after a CONNECT response with status `0x20` (OK) has been seen in the server-to-client direction.
-
-#### Scenario: Handshake packets decoded as binary
-- **WHEN** packets arrive before the CONNECT response
-- **THEN** each packet is decoded using the 16-byte binary header format
-
-#### Scenario: Post-handshake data decoded as ESC/VP21 text
-- **WHEN** a packet arrives after a successful CONNECT response has been seen on the stream
-- **THEN** the dissector labels the packet as `ESC/VP21 data` and displays the payload bytes as ASCII text
-
----
-
-### Requirement: Mid-session ESC/VP21 detection
-When a packet arrives in handshake phase but the dissector has not observed a CONNECT response, the dissector SHALL apply a heuristic to determine whether the payload is ESC/VP21 data.
-
-The heuristic SHALL match payloads that:
-- Begin with an uppercase ASCII letter (`A`–`Z`)
-- Contain only printable ASCII characters and spaces
-- Are terminated by a carriage-return byte (`\r`, `0x0D`)
-- Match the general forms: `CMD?\r`, `CMD VALUE\r`, or `CMD=VALUE\r`
-
-If the heuristic matches, the dissector SHALL:
-1. Promote the stream to data phase immediately as if a CONNECT response had been seen
-2. Decode the current packet as ESC/VP21 data
-3. Annotate the first inferred packet as `ESC/VP21 data [session inferred]`
-
-If the heuristic does not match, the existing behaviour is retained: the packet is labelled `[Unknown / non-ESC/VP.net data]`.
-
-#### Scenario: Query command detected mid-session
-- **WHEN** a packet arrives in handshake phase with payload `PWR?\r`
-- **THEN** the stream is promoted to data phase, the packet is shown as `ESC/VP21 data [session inferred]`, and the payload is displayed as ASCII text
-
-#### Scenario: Set command detected mid-session
-- **WHEN** a packet arrives in handshake phase with payload `PWR ON\r`
-- **THEN** the stream is promoted to data phase, the packet is shown as `ESC/VP21 data [session inferred]`, and the payload is displayed as ASCII text
-
-#### Scenario: Response command detected mid-session
-- **WHEN** a packet arrives in handshake phase with payload `PWR=01\r`
-- **THEN** the stream is promoted to data phase, the packet is shown as `ESC/VP21 data [session inferred]`, and the payload is displayed as ASCII text
-
-#### Scenario: Subsequent packets after promotion
-- **WHEN** additional packets arrive on the same stream after the stream was promoted via heuristic
-- **THEN** they are decoded as normal `ESC/VP21 data` without the `[session inferred]` annotation
-
-#### Scenario: Binary data not misidentified
-- **WHEN** a packet arrives in handshake phase whose payload does not match the ESC/VP21 pattern
-- **THEN** the packet is labelled `[Unknown / non-ESC/VP.net data]` and the stream phase is not changed
-
----
-
 ### Requirement: PASSWORD message payload labelling
 The dissector SHALL label the payload of PASSWORD request and response messages as a distinct field (`password_data`) without interpreting or masking the content.
 
@@ -179,3 +130,17 @@ The dissector SHALL be delivered as a single file `dissectors/escvpnet.lua` with
 #### Scenario: No Python emulator dependency
 - **WHEN** the file is used in an environment where the epson_emulator Python package is not installed
 - **THEN** the dissector operates without errors
+
+### Requirement: Packet-local protocol dispatch
+The dissector SHALL classify each packet independently using only the current packet bytes.
+
+If the payload begins with the 10-byte `ESC/VP.net` magic string, the dissector SHALL decode the packet as ESC/VP.net. If the payload does not begin with that magic string, the dissector SHALL decode the payload as ESC/VP21 data.
+
+#### Scenario: Packet with magic is decoded as ESC/VP.net
+- **WHEN** a packet starts with `ESC/VP.net`
+- **THEN** the dissector parses and displays ESC/VP.net header and extension-header fields
+
+#### Scenario: Packet without magic is decoded as ESC/VP21
+- **WHEN** a packet does not start with `ESC/VP.net`
+- **THEN** the dissector displays the packet payload under `ESC/VP21 data`
+
