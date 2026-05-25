@@ -263,6 +263,7 @@ class ConnectionFormScreen(Screen["dict | None"]):
     def __init__(self, prefill: Optional[dict] = None) -> None:
         super().__init__()
         self._prefill = prefill or {}
+        self._last_proto = str(self._prefill.get("protocol", "vpnet"))
 
     def compose(self) -> ComposeResult:
         pre = self._prefill
@@ -311,7 +312,13 @@ class ConnectionFormScreen(Screen["dict | None"]):
     def on_select_changed(self, event: Select.Changed) -> None:
         if event.select.id == "proto-select":
             proto = str(event.value)
-            self.query_one("#port-input", Input).value = str(_DEFAULT_PORTS.get(proto, 80))
+            port_input = self.query_one("#port-input", Input)
+            port_value = port_input.value.strip()
+            old_default = _DEFAULT_PORTS.get(self._last_proto, 80)
+            # Only auto-apply protocol defaults if the user has not set a custom port.
+            if not port_value or (port_value.isdigit() and int(port_value) == old_default):
+                port_input.value = str(_DEFAULT_PORTS.get(proto, 80))
+            self._last_proto = proto
             self._update_password_visibility()
 
     def _update_password_visibility(self) -> None:
