@@ -25,8 +25,6 @@ class EmulatorRuntimeConfig:
     serial_port: int
     vpnet_port: int
     http_port: int
-    vpnet_auth_required: bool
-    http_auth_required: bool
 
 
 class ChangePasswordScreen(ModalScreen["str | None"]):
@@ -109,6 +107,7 @@ class EmulatorApp(App[None]):
 
     BINDINGS = [
         Binding("p", "toggle_power", "Toggle Power"),
+        Binding("a", "toggle_auth", "Toggle Auth"),
         Binding("w", "change_password", "Change Password"),
         Binding("q", "quit", "Quit"),
     ]
@@ -169,8 +168,9 @@ class EmulatorApp(App[None]):
     def _build_config_table(self) -> None:
         table: DataTable = self.query_one("#config-table", DataTable)
         table.add_column("", key="line", width=32)
-        vpnet_auth_icon = "🔒" if self._runtime_config.vpnet_auth_required else "🔓"
-        http_auth_icon = "🔒" if self._runtime_config.http_auth_required else "🔓"
+        auth_required = bool(self._password_store and self._password_store.enabled)
+        vpnet_auth_icon = "🔒" if auth_required else "🔓"
+        http_auth_icon = "🔒" if auth_required else "🔓"
 
         def cfg_line(name: str, port: int, icon: str | None = None) -> str:
             base = f"{name:<10} {port:>5}"
@@ -187,6 +187,22 @@ class EmulatorApp(App[None]):
         table.add_row(
             cfg_line("HTTP", self._runtime_config.http_port, http_auth_icon),
             key="http",
+        )
+
+    def _refresh_config_table_auth_icons(self) -> None:
+        table: DataTable = self.query_one("#config-table", DataTable)
+        auth_required = bool(self._password_store and self._password_store.enabled)
+        vpnet_auth_icon = "🔒" if auth_required else "🔓"
+        http_auth_icon = "🔒" if auth_required else "🔓"
+        table.update_cell(
+            "vpnet",
+            "line",
+            f"{'ESC/VP.net':<10} {self._runtime_config.vpnet_port:>5} {vpnet_auth_icon}",
+        )
+        table.update_cell(
+            "http",
+            "line",
+            f"{'HTTP':<10} {self._runtime_config.http_port:>5} {http_auth_icon}",
         )
 
     def _register_observers(self) -> None:
@@ -231,8 +247,14 @@ class EmulatorApp(App[None]):
         new_cmd = "PWR ON" if current != "01" else "PWR OFF"
         handle_command(self._state, self._model, new_cmd)
 
+    def action_toggle_auth(self) -> None:
+        if self._password_store is None:
+            return
+        self._password_store.enabled = not self._password_store.enabled
+        self._refresh_config_table_auth_icons()
+
     def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
-        if action == "change_password" and self._password_store is None:
+        if action in {"change_password", "toggle_auth"} and self._password_store is None:
             return None
         return True
 

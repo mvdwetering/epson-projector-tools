@@ -55,7 +55,7 @@ def main() -> None:
     parser.add_argument(
         "--password",
         action="store_true",
-        help="Enable password authentication on all network transports (ESC/VP.net and HTTP). Default password: emulatorpassword. Press 'w' in TUI to change at runtime.",
+        help="Start with password authentication enabled on all network transports (ESC/VP.net and HTTP). Default password: emulatorpassword. Use TUI keys to toggle auth and change password at runtime.",
     )
     parser.add_argument(
         "--loglevel",
@@ -75,13 +75,11 @@ def main() -> None:
     model = load_model(model_path)
     state = ProjectorState(model)
 
-    password_store = PasswordStore("emulatorpassword") if args.password else None
+    password_store = PasswordStore("emulatorpassword", enabled=args.password)
     runtime_config = EmulatorRuntimeConfig(
         serial_port=args.serial_port,
         vpnet_port=args.vpnet_port,
         http_port=args.http_port,
-        vpnet_auth_required=password_store is not None,
-        http_auth_required=password_store is not None,
     )
 
     transports = [

@@ -53,7 +53,7 @@ All emulator transports operate on one shared `ProjectorState` instance.
 	- Serial TCP: `12345`
 	- ESC/VP.net: `3629`
 	- HTTP: `8080`
-- `--password` enables auth on ESC/VP.net and HTTP with initial password `emulatorpassword`
+- `--password` starts with auth enabled on ESC/VP.net and HTTP (can be toggled at runtime) with initial password `emulatorpassword`
 - `--loglevel` controls Python logging
 
 ### Emulator TUI (`ui/app.py`)
@@ -61,7 +61,8 @@ All emulator transports operate on one shared `ProjectorState` instance.
 - Shows connection config panel (ports + auth lock status), state table, and transport command log.
 - Key bindings:
 	- `p`: toggle power (`PWR ON` / `PWR OFF`)
-	- `w`: change auth password at runtime (only when password mode is enabled)
+	- `a`: toggle auth required (`🔓` / `🔒`) at runtime for ESC/VP.net and HTTP
+	- `w`: change auth password at runtime
 	- `q`: quit
 - Command log uses millisecond timestamps and transport labels.
 

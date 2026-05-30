@@ -95,7 +95,7 @@ class VpnetTransport(BaseTransport):
 
         headers = await self._parse_extra_headers(reader, header[15])
 
-        if self._password_store is not None:
+        if self._password_store is not None and self._password_store.enabled:
             password_header = headers.get(0x01)  # 0x01 = Password identifier
             if password_header is None:
                 logger.warning("vpnet: password required but not provided, rejecting")

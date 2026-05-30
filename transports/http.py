@@ -20,8 +20,9 @@ logger = logging.getLogger(__name__)
 class PasswordStore:
     """Mutable container for the HTTP Digest authentication password."""
 
-    def __init__(self, password: str) -> None:
+    def __init__(self, password: str, enabled: bool = True) -> None:
         self.password = password
+        self.enabled = enabled
 
 
 # IR codes → direct VP21 SET command string (TW3200 supported codes)
@@ -59,6 +60,9 @@ def _make_digest_middleware(store: PasswordStore):
 
     @web.middleware
     async def digest_auth(request: web.Request, handler):
+        if not store.enabled:
+            return await handler(request)
+
         # Recompute ha1 per-request so runtime password changes take effect immediately.
         ha1 = _md5(f"EPSONWEB:{_REALM}:{store.password}")
         auth_header = request.headers.get("Authorization", "")
