@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import json
 import logging
 import re
 import secrets
@@ -132,9 +131,8 @@ class HttpTransport(BaseTransport):
             raise web.HTTPBadRequest(reason="Missing jsoncallback parameter")
         response = handle_command(self._state, self._model, cmd_str)
         self._state.log_command("http", cmd_str, response)
-        value = self._extract_value(response, cmd_str)
-        body = json.dumps({"projector": {"feature": {"reply": value}}})
-        return web.Response(content_type="application/json", text=body)
+        reply, is_error = self._parse_json_query_response(response)
+        return web.json_response(self._build_json_query_payload(cmd_str, reply, is_error))
 
     # ------------------------------------------------------------------
     # /cgi-bin/directsend?CMD=VALUE  or  /cgi-bin/directsend?KEY=ir_code
@@ -201,12 +199,24 @@ class HttpTransport(BaseTransport):
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _extract_value(response: str, cmd_str: str) -> str:
-        """Parse 'CMD=value\\r:' → 'value'. Raises HTTPBadRequest on ERR."""
+    def _build_json_query_payload(cmd_str: str, reply: str, is_error: bool) -> dict:
+        """Build Epson-compatible json_query payload with stable feature fields."""
+        return {
+            "projector": {
+                "feature": {
+                    "name": "esc/vp21",
+                    "query": cmd_str,
+                    "reply": reply,
+                    "error": is_error,
+                }
+            }
+        }
+
+    @staticmethod
+    def _parse_json_query_response(response: str) -> tuple[str, bool]:
+        """Parse engine response into json_query reply value and error flag."""
         if response.startswith("ERR"):
-            raise web.HTTPBadRequest(reason=f"Command failed: {cmd_str}")
+            return "ERR", True
         if "=" in response:
-            return response.split("=", 1)[1].rstrip("\r:")
-        raise web.HTTPBadRequest(
-            reason=f"Unexpected engine response: {response!r}"
-        )
+            return response.split("=", 1)[1].rstrip("\r:"), False
+        return "ERR", True
