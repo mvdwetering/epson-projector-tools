@@ -26,7 +26,7 @@ The transport SHALL respond to a CONNECT packet (type `0x03`) with a CONNECT res
 - **THEN** transport closes the connection
 
 ### Requirement: ESC/VP21 pipe after handshake
-After a successful CONNECT, the transport SHALL process incoming data identically to the serial transport: read `\r`-terminated commands, call the engine, send responses.
+After a successful CONNECT, the transport SHALL process incoming data identically to the serial transport: read `\r`-terminated commands, call the engine, send responses. The transport SHALL close the TCP connection if no inbound ESC/VP21 command activity is received for 600 seconds.
 
 #### Scenario: GET command after handshake
 - **WHEN** a connected ESC/VP.net client sends `PWR?\r`
@@ -35,6 +35,14 @@ After a successful CONNECT, the transport SHALL process incoming data identicall
 #### Scenario: Client disconnects after handshake
 - **WHEN** the TCP client closes the connection after handshake
 - **THEN** the transport coroutine exits cleanly
+
+#### Scenario: Idle session times out after handshake
+- **WHEN** a connected ESC/VP.net client sends no command data for 600 seconds after a successful CONNECT
+- **THEN** the transport closes the TCP connection and exits the session coroutine
+
+#### Scenario: Activity before timeout keeps session open
+- **WHEN** a connected ESC/VP.net client sends command data before 600 seconds elapse
+- **THEN** the inactivity timer resets and the connection remains open
 
 ### Requirement: Hardcoded protocol constants
 The ESC/VP.net handshake constants SHALL be hardcoded: magic `"ESC/VP.net"`, version `0x10`, command-type `0x21` (ESC/VP21 Ver1.0). These SHALL NOT be model-configurable.

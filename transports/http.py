@@ -141,7 +141,8 @@ class HttpTransport(BaseTransport):
     async def _handle_directsend(self, request: web.Request) -> web.Response:
         params = list(request.rel_url.query.items())
         if not params:
-            raise web.HTTPBadRequest(reason="No parameters supplied")
+            # null command → connectivity/auth probe; surface as success with no state change
+            return web.Response(status=200)
         cmd, value = params[0]
         if cmd.upper() == "KEY":
             self._dispatch_key(value.upper())

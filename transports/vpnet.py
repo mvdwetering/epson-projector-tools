@@ -22,6 +22,7 @@ _TYPE_CONNECT = 0x03
 _STATUS_OK = 0x20
 _HEADER_SIZE = 16   # 10 (magic) + 1 (ver) + 1 (type) + 2 (reserved) + 1 (status) + 1 (num_headers)
 _EXTRA_HEADER_SIZE = 18
+_DEFAULT_IDLE_TIMEOUT_SECONDS = 600.0
 
 
 def _make_packet(pkt_type: int, status: int, num_headers: int = 0) -> bytes:
@@ -36,12 +37,14 @@ class VpnetTransport(BaseTransport):
         host: str = "0.0.0.0",
         port: int = 3629,
         password_store: PasswordStore | None = None,
+        idle_timeout_seconds: float = _DEFAULT_IDLE_TIMEOUT_SECONDS,
     ) -> None:
         self._state = state
         self._model = model
         self._host = host
         self._port = port
         self._password_store = password_store
+        self._idle_timeout_seconds = idle_timeout_seconds
 
     async def start(self) -> None:
         server = await asyncio.start_server(
@@ -58,7 +61,14 @@ class VpnetTransport(BaseTransport):
         try:
             if not await self._handshake(reader, writer):
                 return
-            await handle_escvp21_stream(reader, writer, self._state, self._model, "vpnet")
+            await handle_escvp21_stream(
+                reader,
+                writer,
+                self._state,
+                self._model,
+                "vpnet",
+                read_timeout=self._idle_timeout_seconds,
+            )
         except (asyncio.IncompleteReadError, ConnectionResetError, OSError):
             logger.debug("vpnet: connection closed during handshake from %s", peer)
         finally:
