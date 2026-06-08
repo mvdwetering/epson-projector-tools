@@ -14,9 +14,7 @@ from pathlib import Path
 
 from projector.model import load_model
 from projector.state import ProjectorState
-from transports.serial import SerialTransport
-from transports.vpnet import VpnetTransport
-from transports.http import HttpTransport, PasswordStore
+from transports.http import PasswordStore
 from ui.app import EmulatorApp, EmulatorRuntimeConfig
 
 
@@ -26,8 +24,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        default="eh_tw3200",
-        help="Model name (file in models/) or path to a YAML file. Default: eh_tw3200",
+        default="TW3200",
+        help="Model name (file in models/) or path to a JSON file. Default: TW3200",
     )
     parser.add_argument(
         "--host",
@@ -67,31 +65,27 @@ def main() -> None:
 
     logging.basicConfig(level=args.loglevel)
 
-    # Resolve model path: bare name → models/<name>.yaml, otherwise treat as path
+    # Resolve model path: bare name -> models/<name>.json, otherwise treat as path.
     model_path = Path(args.model)
     if not model_path.suffix:
-        model_path = Path(__file__).parent / "models" / f"{args.model}.yaml"
+        model_path = Path(__file__).parent / "models" / f"{args.model}.json"
 
     model = load_model(model_path)
     state = ProjectorState(model)
 
     password_store = PasswordStore("emulatorpassword", enabled=args.password)
     runtime_config = EmulatorRuntimeConfig(
+        host=args.host,
         serial_port=args.serial_port,
         vpnet_port=args.vpnet_port,
         http_port=args.http_port,
+        models_dir=Path(__file__).parent / "models",
     )
-
-    transports = [
-        SerialTransport(state, model, host=args.host, port=args.serial_port),
-        VpnetTransport(state, model, host=args.host, port=args.vpnet_port, password_store=password_store),
-        HttpTransport(state, model, host=args.host, port=args.http_port, password=password_store),
-    ]
 
     app = EmulatorApp(
         state=state,
         model=model,
-        transports=transports,
+        transports=None,
         runtime_config=runtime_config,
         password_store=password_store,
     )

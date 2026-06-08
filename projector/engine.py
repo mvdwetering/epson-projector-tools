@@ -47,6 +47,16 @@ def handle_command(state: ProjectorState, model: ModelDef, cmd_str: str) -> str:
 # ------------------------------------------------------------------
 
 def _handle_get(state: ProjectorState, model: ModelDef, cmd: str) -> str:
+    if cmd in {"SOURCELIST", "SOURCELISTA"}:
+        cmd_def = model.commands.get(cmd)
+        if cmd_def is None or not cmd_def.readable:
+            return _ERR
+        entries: list[str] = []
+        for src in model.non_cyclic_sources():
+            entries.append(src.code)
+            entries.append(src.name)
+        return f"{cmd}={' '.join(entries)}\r:"
+
     cmd_def = model.commands.get(cmd)
     if cmd_def is None or not cmd_def.readable:
         return _ERR
@@ -67,7 +77,7 @@ def _handle_set(state: ProjectorState, model: ModelDef, cmd: str, value: str) ->
 
     # INC / DEC on numeric commands
     if value in ("INC", "DEC"):
-        if not cmd_def.inc_dec:
+        if not cmd_def.inc_dec or not cmd_def.decimal_single_param:
             return _ERR
         current = state.get(cmd)
         if current is None:
@@ -82,6 +92,12 @@ def _handle_set(state: ProjectorState, model: ModelDef, cmd: str, value: str) ->
             new_val = max(cmd_def.range[0], min(cmd_def.range[1], new_val))
         state.set(cmd, str(new_val))
         return _OK
+
+    if cmd == "SOURCE" and value not in model.source_codes():
+        return _ERR
+
+    if cmd == "KEY" and value not in model.ir_codes:
+        return _ERR
 
     # notify_only commands (e.g. KEY): acknowledge but don't store
     if cmd_def.notify_only:

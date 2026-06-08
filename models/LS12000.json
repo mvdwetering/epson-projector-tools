@@ -1,0 +1,3478 @@
+{
+  "schemaVersion": "1.0-compiled",
+  "sourceWorkbook": {
+    "fileName": "epson671640eu.xlsx",
+    "sheetName": "LS12000"
+  },
+  "model": {
+    "id": "LS12000",
+    "name": "LS12000",
+    "aliases": [
+      "CH-LS12000B",
+      "EH-LS12000B"
+    ],
+    "sourceTab": "LS12000",
+    "supportHeaders": [
+      "LS11000",
+      "LS12000"
+    ],
+    "connectivity": {
+      "rs232c": true,
+      "wiredLan": true,
+      "wirelessLan": false,
+      "usbB": false
+    }
+  },
+  "executionTimes": [
+    {
+      "item": "PWR ON",
+      "condition": "After displaying the logo",
+      "time": "30 seconds"
+    },
+    {
+      "item": "PWR OFF",
+      "condition": "Normal",
+      "time": "0 second"
+    },
+    {
+      "item": "PWR OFF",
+      "condition": "When a high temperature warning occurs",
+      "time": "20 seconds"
+    },
+    {
+      "item": "PWR OFF",
+      "condition": "When a high temperature error occurs",
+      "time": "300 seconds"
+    },
+    {
+      "item": "PWR OFF",
+      "condition": "When an error other than a high temperature error occurs",
+      "time": "90 seconds"
+    }
+  ],
+  "commands": [
+    {
+      "category": "Power Control",
+      "function": "Power On",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "PWR ON",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PWR",
+      "parameterPlaceholders": [
+        "ON"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": true,
+      "rawDetails": [],
+      "sourceRows": [
+        15
+      ],
+      "network": true
+    },
+    {
+      "category": "Power Control",
+      "function": "Power Off",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "PWR OFF",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PWR",
+      "parameterPlaceholders": [
+        "OFF"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": true,
+      "rawDetails": [],
+      "sourceRows": [
+        16
+      ],
+      "network": true
+    },
+    {
+      "category": "Power Control",
+      "function": "Confirming power status",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "PWR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PWR?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Standby Mode"
+        },
+        {
+          "code": "01",
+          "value": "Normal status"
+        },
+        {
+          "code": "02",
+          "value": "Warmup"
+        },
+        {
+          "code": "03",
+          "value": "Cool down"
+        },
+        {
+          "code": "04",
+          "value": "Standby Mode  (Network ON) / Communication Standby"
+        },
+        {
+          "code": "05",
+          "value": "Abnormality standby"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": true,
+      "rawDetails": [
+        "00: Standby Mode\n01: Normal status \n02: Warmup\n03: Cool down\n04: Standby Mode  (Network ON) / Communication Standby\n05: Abnormality standby"
+      ],
+      "sourceRows": [
+        17,
+        18
+      ],
+      "network": true
+    },
+    {
+      "category": "Main Unit Operation",
+      "function": "Key operation",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "KEY xx",
+      "setCommandVariants": [],
+      "setCommandNote": "*Refer the \"Key code\"",
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "KEY",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [],
+      "sourceRows": [
+        19
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting vertical keystone correction value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "VKEYSTONE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "VKEYSTONE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "VKEYSTONE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        20,
+        21,
+        22
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting horizontal keystone correction value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "HKEYSTONE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "HKEYSTONE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "HKEYSTONE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        23,
+        24,
+        25
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting Quick Corner",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "QC x1 x2 x3 x4 x5 x6 x7 x8",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "QC?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "QC",
+      "parameterPlaceholders": [
+        "x1",
+        "x2",
+        "x3",
+        "x4",
+        "x5",
+        "x6",
+        "x7",
+        "x8"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "9999"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1-x8:0-9999\n This command can be set in the following turns.\n Left-top  (x, y) => Right-top  (x, y) => Right-bottom  (x, y) => Left-bottom  (x, y)",
+        "0-9999\n  The coordinates of 4 points are returned by 4lines."
+      ],
+      "sourceRows": [
+        35,
+        36,
+        37,
+        38
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting Quick Corner (Vector)",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "QCV x1 x2 x3 x4 x5 x6 x7 x8",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "QCV",
+      "parameterPlaceholders": [
+        "x1",
+        "x2",
+        "x3",
+        "x4",
+        "x5",
+        "x6",
+        "x7",
+        "x8"
+      ],
+      "parameterRanges": [
+        {
+          "min": "99",
+          "max": "99"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1-x8: -99-99\n This command can be set in the following turns.\n Left-top  (x, y) => Right-top  (x, y) => Right-bottom  (x, y) => Left-bottom  (x, y)"
+      ],
+      "sourceRows": [
+        39,
+        40
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting Quick Corner (Coordinates movement)",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "QCMV control direction movement",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "QCMV",
+      "parameterPlaceholders": [
+        "control",
+        "direction",
+        "movement"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "Left-Top"
+        },
+        {
+          "code": "02",
+          "value": "Right-Top"
+        },
+        {
+          "code": "03",
+          "value": "Right-bottom"
+        },
+        {
+          "code": "04",
+          "value": "Left-bottom"
+        },
+        {
+          "code": "INIT",
+          "value": "(Setting only)"
+        },
+        {
+          "code": "01",
+          "value": "move to upper"
+        },
+        {
+          "code": "02",
+          "value": "move to lower"
+        },
+        {
+          "code": "03",
+          "value": "move to left"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "control: Assign Quick Corner control position\n    01: Left-Top\n    02: Right-Top\n    03: Right-bottom\n    04: Left-bottom\n    INIT:  (Setting only)\n\ndirection: Assign direction\n    01: move to upper\n    02: move to lower\n    03: move to left\n    04. move to right\n\nmovement: input the movement value\n    Only \"INC\" command is available.  (Setting only)"
+      ],
+      "sourceRows": [
+        41,
+        42
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Confirmation of correction function setting",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CORRECTMET x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CORRECTMET?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CORRECTMET",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "H/V keystone"
+        },
+        {
+          "code": "02",
+          "value": "Quick Corner"
+        },
+        {
+          "code": "03",
+          "value": "Point Correction"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: H/V keystone\n02: Quick Corner\n03: Point Correction"
+      ],
+      "sourceRows": [
+        46,
+        47,
+        48
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting Aspect ratio",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "ASPECT xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ASPECT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ASPECT",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "30",
+          "value": "Auto"
+        },
+        {
+          "code": "40",
+          "value": "Full"
+        },
+        {
+          "code": "50",
+          "value": "Zoom"
+        },
+        {
+          "code": "60",
+          "value": "Native"
+        },
+        {
+          "code": "80",
+          "value": "Anamorphic Wide"
+        },
+        {
+          "code": "90",
+          "value": "Horiz. Squeeze"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "<LS12000B>\n 30: Auto\n 40: Full\n 50: Zoom\n 60: Native\n 80: Anamorphic Wide\n 90: Horiz. Squeeze\nINIT  (Setting only)",
+        "<Auto>\n  x1: mode\n  x2: Parameter of \"Auto\" =30"
+      ],
+      "sourceRows": [
+        60,
+        61,
+        62,
+        63,
+        64
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Luminance Level setting",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "LUMLEVEL level",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "LUMLEVEL?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LUMLEVEL",
+      "parameterPlaceholders": [
+        "level"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        74,
+        75,
+        76
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting Tele/Wide value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "ZOOM xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ZOOM?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ZOOM",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "1023"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": true,
+      "minMaxSupported": true,
+      "operationPassword": true,
+      "rawDetails": [
+        "Digital Zoom\n Parameter:\n   MIN/MAX/INC/DEC/OFF\n Return Code:\n   Zoom position: 0-1023"
+      ],
+      "sourceRows": [
+        86,
+        87,
+        88
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting focus value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "FOCUS xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "FOCUS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "FOCUS",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "1023"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": true,
+      "minMaxSupported": true,
+      "operationPassword": true,
+      "rawDetails": [
+        "Powered Focus\n Parameter:\n   MIN/MAX/INC/DEC/OFF\n Return Code:\n   Focus position: 0-1023"
+      ],
+      "sourceRows": [
+        89,
+        90,
+        91
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting vertical lens shift value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "LENS x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "LENS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LENS",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "1023"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": true,
+      "operationPassword": true,
+      "rawDetails": [
+        "Powered Lens Shift:\n  INIT/MIN/MAX/INC/DEC/OFF",
+        "LENS=x1\n\nx1: A/D converted value\n  0-1023"
+      ],
+      "sourceRows": [
+        92,
+        93,
+        94,
+        95
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting horizontal lens shift value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "HLENS x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "HLENS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "HLENS",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "1023"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": true,
+      "operationPassword": true,
+      "rawDetails": [
+        "Powered Lens Shift:\n  INIT/MIN/MAX/INC/DEC/OFF",
+        "HLENS=x1\n\nx1: 0-1023\n  A/D converted value"
+      ],
+      "sourceRows": [
+        96,
+        97,
+        98,
+        99
+      ],
+      "network": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Setting overscan ratio",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "OVSCAN xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "OVSCAN?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "OVSCAN",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "02",
+          "value": "4%"
+        },
+        {
+          "code": "04",
+          "value": "8%"
+        },
+        {
+          "code": "A0",
+          "value": "Auto"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n02: 4%\n04: 8%\nA0: Auto\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        108,
+        109,
+        110
+      ],
+      "network": true
+    },
+    {
+      "category": "Changing Source/Input resolution setting",
+      "function": "Selecting/Confirming input source",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "SOURCE xx",
+      "setCommandVariants": [],
+      "setCommandNote": "* Refer the \"Source code\"",
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SOURCE",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [],
+      "sourceRows": [
+        114,
+        115
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming brightness value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "BRIGHT xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "BRIGHT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "BRIGHT",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        126,
+        127,
+        128
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming contrast value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CONTRAST xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CONTRAST?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CONTRAST",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        129,
+        130,
+        131
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming density value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "DENSITY xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "DENSITY?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "DENSITY",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        132,
+        133,
+        134
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming tint value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "TINT xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "TINT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "TINT",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        135,
+        136,
+        137
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming color temperature value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CTEMP xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CTEMP?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CTEMP",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "Absolute color temperature\n  0-255\n  INIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        154,
+        155,
+        156
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming flesh tone value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "FCOLOR xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "FCOLOR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "FCOLOR",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        157,
+        158,
+        159
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming color mode",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CMODE xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CMODE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CMODE",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "06",
+          "value": "Dynamic"
+        },
+        {
+          "code": "07",
+          "value": "Natural"
+        },
+        {
+          "code": "0C",
+          "value": "Bright Cinema"
+        },
+        {
+          "code": "15",
+          "value": "Cinema"
+        },
+        {
+          "code": "20",
+          "value": "B&W Cinema *"
+        },
+        {
+          "code": "23",
+          "value": "Vivid"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "06: Dynamic\n07: Natural\n0C: Bright Cinema\n15: Cinema\n20: B&W Cinema *\n23: Vivid\nINIT  (Setting only)\n\n* LS12000B for EAI"
+      ],
+      "sourceRows": [
+        160,
+        161,
+        162
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming noise reduction adjustment",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "NRS xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "NRS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "NRS",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC",
+        "0-255"
+      ],
+      "sourceRows": [
+        176,
+        177,
+        178,
+        179
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "MPEG smoothing",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "MPEGNRS x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "MPEGNRS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "MPEGNRS",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "Low"
+        },
+        {
+          "code": "02",
+          "value": "Normal"
+        },
+        {
+          "code": "03",
+          "value": "High"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: Low\n02: Normal\n03: High"
+      ],
+      "sourceRows": [
+        180,
+        181,
+        182
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming offset value (Red/Blue/Green)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "OFFSETR xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "OFFSETR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "OFFSETR",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)",
+        "0-255\nINIT/INC/DEC  (Setting only)",
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming gain value (Red/Blue/Green)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "GAINR xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "GAINR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "GAINR",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)",
+        "0-255\nINIT/INC/DEC  (Setting only)",
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming gamma value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "GAMMA xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "GAMMA?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "GAMMA",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "20",
+          "value": "Setting 2"
+        },
+        {
+          "code": "21",
+          "value": "Setting 1"
+        },
+        {
+          "code": "22",
+          "value": "Setting 0"
+        },
+        {
+          "code": "23",
+          "value": "Setting -1"
+        },
+        {
+          "code": "24",
+          "value": "Setting -2"
+        },
+        {
+          "code": "F0",
+          "value": "Custom"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "20: Setting 2\n21: Setting 1\n22: Setting 0\n23: Setting -1\n24: Setting -2\nF0: Custom\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        207,
+        208,
+        209
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming gamma step value",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "GAMMALV x1 x2",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "GAMMALV",
+      "parameterPlaceholders": [
+        "x1",
+        "x2"
+      ],
+      "parameterRanges": [
+        {
+          "min": "00",
+          "max": "08"
+        },
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Tone\n  00-08: Tone0 ~ Tone9\nx2: Adjustment value\n  0-255\n  INC/DEC",
+        "Please refer x1 of GAMMALV command",
+        "0-255"
+      ],
+      "sourceRows": [
+        210,
+        211,
+        212,
+        213,
+        214
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation RGBCMY Set value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "AXESADJ x1 x2 x3 x4",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "AXESADJ?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "AXESADJ",
+      "parameterPlaceholders": [
+        "x1",
+        "x2",
+        "x3",
+        "x4"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "R   02: G   03:B"
+        },
+        {
+          "code": "04",
+          "value": "C   05: M   06: Y"
+        },
+        {
+          "code": "90",
+          "value": "ALL"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Color\n  01: R   02: G   03:B\n  04: C   05: M   06: Y\n  90: ALL\n\nx2: Hue\n  0-255\n\nx3: Chromatic value\n  0-255\n\nx4: Brightness\n  0-255\n  INIT",
+        "0-255\nReturn the hue, chromatic value, and brightness of each color in the order of R, G, B, C, M, Y"
+      ],
+      "sourceRows": [
+        215,
+        216,
+        217,
+        218
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Call of memory",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "POPMEM x1 x2",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "POPMEM",
+      "parameterPlaceholders": [
+        "x1",
+        "x2"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "02",
+          "value": "Advanced"
+        },
+        {
+          "code": "01",
+          "value": "Memory 1"
+        },
+        {
+          "code": "0A",
+          "value": "Memory 10"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Memory item\n   02: Advanced\nx2  Memory No.\n   01: Memory 1\n          :\n   0A: Memory 10"
+      ],
+      "sourceRows": [
+        229,
+        230
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Registration of memory",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "PUSHMEM x1 x2",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PUSHMEM",
+      "parameterPlaceholders": [
+        "x1",
+        "x2"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "02",
+          "value": "Advanced"
+        },
+        {
+          "code": "01",
+          "value": "Memory 1"
+        },
+        {
+          "code": "0A",
+          "value": "Memory 10"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Memory item\n   02: Advanced\nx2  Memory No.\n   01: Memory 1\n          :\n   0A: Memory 10"
+      ],
+      "sourceRows": [
+        231,
+        232
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Deletion of memory",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "ERASEMEM x1 x2",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ERASEMEM",
+      "parameterPlaceholders": [
+        "x1",
+        "x2"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "ALL"
+        },
+        {
+          "code": "02",
+          "value": "Advanced"
+        },
+        {
+          "code": "01",
+          "value": "Memory 1"
+        },
+        {
+          "code": "0A",
+          "value": "Memory 10"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Memory item\n   00: ALL\n   02: Advanced\nx2  Memory No.\n   01: Memory 1\n          :\n   0A: Memory 10"
+      ],
+      "sourceRows": [
+        233,
+        234
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Confirming of the color",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CSEL?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CSEL?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "07",
+          "value": "RGB/RGBCMY"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "07:  RGB/RGBCMY"
+      ],
+      "sourceRows": [
+        235,
+        236
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "IMGPRESET x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "IMGPRESET?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "IMGPRESET",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "Preset 1"
+        },
+        {
+          "code": "02",
+          "value": "Preset 2"
+        },
+        {
+          "code": "03",
+          "value": "Preset 3"
+        },
+        {
+          "code": "04",
+          "value": "Preset 4"
+        },
+        {
+          "code": "05",
+          "value": "Preset 5"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: Preset 1\n02: Preset 2\n03: Preset 3\n04: Preset 4\n05: Preset 5\nINIT (Preset only)"
+      ],
+      "sourceRows": [
+        246,
+        247,
+        248
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "High Resolution: Fine line adjustment",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SHRF x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SHRF?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SHRF",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINC/DEC/INIT"
+      ],
+      "sourceRows": [
+        252,
+        253,
+        254
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "High Resolution: Soft focus detail",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SHRS x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SHRS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SHRS",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINC/DEC/INIT"
+      ],
+      "sourceRows": [
+        255,
+        256,
+        257
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming frame interpolation setting",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "MCFI xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "MCFI?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "MCFI",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "Low"
+        },
+        {
+          "code": "02",
+          "value": "Normal"
+        },
+        {
+          "code": "03",
+          "value": "High"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: Low\n02: Normal\n03: High\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        269,
+        270,
+        271
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming color space setting (HDR)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CLRSPACE x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CLRSPACE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CLRSPACE",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Auto"
+        },
+        {
+          "code": "01",
+          "value": "BT.709"
+        },
+        {
+          "code": "02",
+          "value": "BT.2020"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00:Auto\n01: BT.709\n02: BT.2020"
+      ],
+      "sourceRows": [
+        272,
+        273,
+        274
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming Dynamic range setting (HDR)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "DYNRANGE x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "DYNRANGE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "DYNRANGE",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Auto"
+        },
+        {
+          "code": "01",
+          "value": "SDR"
+        },
+        {
+          "code": "21",
+          "value": "HDR10/HDR10+"
+        },
+        {
+          "code": "30",
+          "value": "HLG"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: Auto\n01: SDR\n21: HDR10/HDR10+\n30: HLG"
+      ],
+      "sourceRows": [
+        275,
+        276,
+        277
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming HDR PQ setting",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "HDRPQ x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "HDRPQ?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "HDRPQ",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "01",
+          "max": "16"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01-16: HDR10 Mode"
+      ],
+      "sourceRows": [
+        278,
+        279,
+        280
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming HDRHLG setting",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "HDRHLG x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "HDRHLG?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "HDRHLG",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "01",
+          "max": "16"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01-16: HLG Mode"
+      ],
+      "sourceRows": [
+        281,
+        282,
+        283
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming GRAYSCALE setting",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "GRAYSCALE x1 x2 x3",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "GRAYSCALE",
+      "parameterPlaceholders": [
+        "x1",
+        "x2",
+        "x3"
+      ],
+      "parameterRanges": [
+        {
+          "min": "01",
+          "max": "0B"
+        },
+        {
+          "min": "000",
+          "max": "255"
+        }
+      ],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "R"
+        },
+        {
+          "code": "02",
+          "value": "G"
+        },
+        {
+          "code": "03",
+          "value": "B"
+        },
+        {
+          "code": "04",
+          "value": "All"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Adjustment item\n01: R\n02: G\n03: B\n04: All",
+        "x1: Adjustment item\n01: R\n02: G\n03: B",
+        "Level value: 01-0B\nAdjustment value: 000-255"
+      ],
+      "sourceRows": [
+        284,
+        285,
+        286,
+        287,
+        288,
+        289,
+        290
+      ],
+      "network": false
+    },
+    {
+      "category": "Image setting",
+      "function": "Setting/Confirming BOXPATTERN setting",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "BOXPATTERN x1 [x2 x3 x4 x5]",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "BOXPATTERN?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "BOXPATTERN",
+      "parameterPlaceholders": [
+        "x1",
+        "[x2",
+        "x3",
+        "x4",
+        "x5]"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "ON"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Pattern\n00: OFF\n01: ON"
+      ],
+      "sourceRows": [
+        291,
+        292,
+        293,
+        294,
+        295,
+        296,
+        297
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation scene adaptive gamma set",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SCENEGAMMA x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SCENEGAMMA?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SCENEGAMMA",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC (Setting only)"
+      ],
+      "sourceRows": [
+        298,
+        299,
+        300
+      ],
+      "network": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Auto Contrast Enhancement set",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CONTENHANCE x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CONTENHANCE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CONTENHANCE",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC (Setting only)"
+      ],
+      "sourceRows": [
+        301,
+        302,
+        303
+      ],
+      "network": true
+    },
+    {
+      "category": "Image control",
+      "function": "Image Processing set",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "IMGPROC mode",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "IMGPROC?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "IMGPROC",
+      "parameterPlaceholders": [
+        "mode"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "Fine"
+        },
+        {
+          "code": "02",
+          "value": "Fast"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: Fine\n02: Fast\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        304,
+        305,
+        306
+      ],
+      "network": true
+    },
+    {
+      "category": "Unique function",
+      "function": "Setting/Confirming A/V mute",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "MUTE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "MUTE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "MUTE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON : Execute \"Blank\"\nOFF: Cancel \"Blank\"\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        353,
+        354,
+        355
+      ],
+      "network": true
+    },
+    {
+      "category": "Unique function",
+      "function": "Setting/Confirming LCD alignment value",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "LCDALIGNMENT mode x y updown leftright",
+      "setCommandVariants": [
+        "LCDALIGNMENT mode param"
+      ],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LCDALIGNMENT",
+      "parameterPlaceholders": [
+        "mode",
+        "x",
+        "y",
+        "updown",
+        "leftright"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Execute adjustment (Specifying coordinate)"
+        },
+        {
+          "code": "01",
+          "value": "LCD alignment correction setting"
+        },
+        {
+          "code": "02",
+          "value": "Adjustment color setting"
+        },
+        {
+          "code": "03",
+          "value": "Pattern color setting"
+        },
+        {
+          "code": "04",
+          "value": "Execute adjustment (Overall adjustment)"
+        },
+        {
+          "code": "00",
+          "value": "Acquisition of adjustment value (Specifying coordinate)"
+        },
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "ON"
+        },
+        {
+          "code": "01",
+          "value": "Red"
+        },
+        {
+          "code": "02",
+          "value": "Blue"
+        },
+        {
+          "code": "01",
+          "value": "R/G/B"
+        },
+        {
+          "code": "02",
+          "value": "R/G"
+        },
+        {
+          "code": "03",
+          "value": "G/B"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "mode\n  00: Execute adjustment (Specifying coordinate)\n  01: LCD alignment correction setting\n  02: Adjustment color setting\n  03: Pattern color setting\n  04: Execute adjustment (Overall adjustment)\n  INIT  (Setting only)\n\nx\n  0000~270F (9999): Return x axis\ny\n  0000~270F (9999): Return y axis",
+        "mode\n  00: Acquisition of adjustment value (Specifying coordinate)\n  01: LCD alignment correction setting\n  02: Adjustment color setting\n  03: Pattern color setting\n\nx\n  0000~270F (9999): Return x axis\ny\n  0000~270F (9999): Return y axis",
+        "Acquisition of adjustment value  (when \"00\" specified)\nReturn the vertical adjustment value and the horizontal adjustment value\n\nparam\n  - Acquisition of LCD alignment correction  (01)\n     00: OFF\n     01: ON\n  - Acquisition of adjustment color  (02)\n     01:  Red\n     02:  Blue\n  - Acquisition of pattern color  (03)\n     01: R/G/B\n     02: R/G\n     03: G/B"
+      ],
+      "sourceRows": [
+        377,
+        378,
+        379,
+        380,
+        381,
+        382
+      ],
+      "network": true
+    },
+    {
+      "category": "Unique function",
+      "function": "Call of LCD alignment memory",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "POPLA x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "POPLA",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "Memory 1"
+        },
+        {
+          "code": "02",
+          "value": "Memory 2"
+        },
+        {
+          "code": "03",
+          "value": "Memory 3"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: Memory 1\n02: Memory 2\n03: Memory 3"
+      ],
+      "sourceRows": [
+        383,
+        384
+      ],
+      "network": true
+    },
+    {
+      "category": "Unique function",
+      "function": "Registration of LCD alignment memory",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "PUSHLA x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PUSHLA",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "Memory 1"
+        },
+        {
+          "code": "02",
+          "value": "Memory 2"
+        },
+        {
+          "code": "03",
+          "value": "Memory 3"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: Memory 1\n02: Memory 2\n03: Memory 3"
+      ],
+      "sourceRows": [
+        385,
+        386
+      ],
+      "network": true
+    },
+    {
+      "category": "Unique function",
+      "function": "Deletion of LCD alignment memory",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "ERASELA x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ERASELA",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "Memory 1"
+        },
+        {
+          "code": "02",
+          "value": "Memory 2"
+        },
+        {
+          "code": "03",
+          "value": "Memory 3"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: Memory 1\n02: Memory 2\n03: Memory 3"
+      ],
+      "sourceRows": [
+        387,
+        388
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Setting/Confirming the reverse image (Horizontal)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "HREVERSE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "HREVERSE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "HREVERSE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON : Flip horizontal\nOFF: Normal position\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        389,
+        390,
+        391
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Setting/Confirming the reverse image (Vertical)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "VREVERSE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "VREVERSE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "VREVERSE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON : Flip vertical\nOFF: Normal position\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        392,
+        393,
+        394
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Reset All",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "INITALL2 x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "INITALL2",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1 = Initializing target  (Hex)\n  bit 15: Reserved\n  bit 14: Reserved\n  bit 13: Reserved\n  bit 12: Reserved\n  bit 11: Reserved\n  bit 10: Memory\n  bit  9: Multi-Projection\n  bit  8: Interactive\n  bit  7: Pen/Touch\n  bit  6: Network\n  bit  5: Management\n  bit  4: Operation\n  bit  3: Display\n  bit  2: Installation\n  bit  1: Signal I/O\n  bit  0: Image\n\nSet as 0: Do not perform initialize\nSet as 1: Perform initialize\n\n*This parameter is bit assigned. Please take care to use this command."
+      ],
+      "sourceRows": [
+        399,
+        400
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Selecting/Confirming Communication Speed",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SPEED xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SPEED?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SPEED",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00\uff1a9600bps\n01\uff1a19200bps\n02\uff1a38400bps\n03\uff1a57600bps\nINIT",
+        "00\uff1a9600bps\n01\uff1a19200bps\n02\uff1a38400bps\n03\uff1a57600bps"
+      ],
+      "sourceRows": [
+        407,
+        408,
+        409,
+        410
+      ],
+      "network": false
+    },
+    {
+      "category": "Environment setting",
+      "function": "Setting/Confirming illumination",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "ILLUM xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ILLUM?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ILLUM",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "ON"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: ON\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        430,
+        431,
+        432
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Call of lens position\n\n* Recalls the lens shift (LENS/HLENS), zoom (ZOOM), focus (FOCUS), and distortion (DISTORTION) saved in the lens position.",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "POPLP xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "POPLP",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "memory1"
+        },
+        {
+          "code": "02",
+          "value": "memory2"
+        },
+        {
+          "code": "03",
+          "value": "memory3"
+        },
+        {
+          "code": "04",
+          "value": "memory4"
+        },
+        {
+          "code": "05",
+          "value": "memory5"
+        },
+        {
+          "code": "06",
+          "value": "memory6"
+        },
+        {
+          "code": "07",
+          "value": "memory7"
+        },
+        {
+          "code": "08",
+          "value": "memory8"
+        },
+        {
+          "code": "09",
+          "value": "memory9"
+        },
+        {
+          "code": "0A",
+          "value": "memory10"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: memory1\n02: memory2\n03: memory3\n04: memory4\n05: memory5\n06: memory6\n07: memory7\n08: memory8\n09: memory9\n0A: memory10"
+      ],
+      "sourceRows": [
+        433,
+        434
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Registration of lens position\n\n* Save the position of the lens adjusted using lens shift, zoom, focus, and distortion.",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "PUSHLP xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PUSHLP",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "memory1"
+        },
+        {
+          "code": "02",
+          "value": "memory2"
+        },
+        {
+          "code": "03",
+          "value": "memory3"
+        },
+        {
+          "code": "04",
+          "value": "memory4"
+        },
+        {
+          "code": "05",
+          "value": "memory5"
+        },
+        {
+          "code": "06",
+          "value": "memory6"
+        },
+        {
+          "code": "07",
+          "value": "memory7"
+        },
+        {
+          "code": "08",
+          "value": "memory8"
+        },
+        {
+          "code": "09",
+          "value": "memory9"
+        },
+        {
+          "code": "0A",
+          "value": "memory10"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: memory1\n02: memory2\n03: memory3\n04: memory4\n05: memory5\n06: memory6\n07: memory7\n08: memory8\n09: memory9\n0A: memory10"
+      ],
+      "sourceRows": [
+        435,
+        436
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Deletion of lens position\n\n* Initialize the lens shift, zoom, focus, and distortion saved in the lens position.",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "ERASELP xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ERASELP",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "ALL"
+        },
+        {
+          "code": "01",
+          "value": "memory1"
+        },
+        {
+          "code": "02",
+          "value": "memory2"
+        },
+        {
+          "code": "03",
+          "value": "memory3"
+        },
+        {
+          "code": "04",
+          "value": "memory4"
+        },
+        {
+          "code": "05",
+          "value": "memory5"
+        },
+        {
+          "code": "06",
+          "value": "memory6"
+        },
+        {
+          "code": "07",
+          "value": "memory7"
+        },
+        {
+          "code": "08",
+          "value": "memory8"
+        },
+        {
+          "code": "09",
+          "value": "memory9"
+        },
+        {
+          "code": "0A",
+          "value": "memory10"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: ALL\n01: memory1\n02: memory2\n03: memory3\n04: memory4\n05: memory5\n06: memory6\n07: memory7\n08: memory8\n09: memory9\n0A: memory10"
+      ],
+      "sourceRows": [
+        437,
+        438
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Setting/Confirming the reverse Key position",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "KREVERSE xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "KREVERSE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "KREVERSE",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "10",
+          "value": "OFF"
+        },
+        {
+          "code": "11",
+          "value": "ON"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "10:OFF\n11:ON\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        439,
+        440,
+        441
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Standby confirmation setting",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "STANDBYCONF mode",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "STANDBYCONF?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "STANDBYCONF",
+      "parameterPlaceholders": [
+        "mode"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Standby confirmation OFF"
+        },
+        {
+          "code": "01",
+          "value": "Standby confirmation ON"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: Standby confirmation OFF\n01: Standby confirmation ON\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        455,
+        456,
+        457
+      ],
+      "network": false
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation batch setup range",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "BARANGE x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "BARANGE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "BARANGE",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "ALL"
+        },
+        {
+          "code": "01",
+          "value": "Limited"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: ALL\n01: Limited"
+      ],
+      "sourceRows": [
+        498,
+        499,
+        500
+      ],
+      "network": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation Menu color",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "MENUCOLOR x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "MENUCOLOR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "MENUCOLOR",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Black"
+        },
+        {
+          "code": "01",
+          "value": "White"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: Black\n01: White\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        511,
+        512,
+        513
+      ],
+      "network": true
+    },
+    {
+      "category": "Network setting",
+      "function": "Getting AMX DDDP BeaconMessage",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "AMX",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "AMX",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "*The return form follows the specification of AMX. \n  AMXB<-SDKClass=VideoProjector>\n  <-GUID=EPSON_EMP001><-Revision=1.0.0>"
+      ],
+      "sourceRows": [
+        526,
+        527
+      ],
+      "network": false
+    },
+    {
+      "category": "Network setting",
+      "function": "Setting/Confirming of AMX DDDP IP BeaconMessage",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "AMXDDDP xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "AMXDDDP?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "AMXDDDP",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "BeaconMessage  stop"
+        },
+        {
+          "code": "01",
+          "value": "BeaconMessage  start"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: BeaconMessage  stop\n 01: BeaconMessage  start\n INIT (Setting only)"
+      ],
+      "sourceRows": [
+        528,
+        529,
+        530
+      ],
+      "network": true
+    },
+    {
+      "category": "Information",
+      "function": "Getting lamp operation time",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "LAMP?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LAMP?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Laser operation time"
+      ],
+      "sourceRows": [
+        576,
+        577
+      ],
+      "network": true
+    },
+    {
+      "category": "Information",
+      "function": "Getting operation time",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ONTIME?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ONTIME?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ONTIME=x1\n x1: Operation Time"
+      ],
+      "sourceRows": [
+        578,
+        579
+      ],
+      "network": true
+    },
+    {
+      "category": "Information",
+      "function": "Signal status",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SIGNAL?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SIGNAL?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "No signal"
+        },
+        {
+          "code": "01",
+          "value": "Signal detected"
+        },
+        {
+          "code": "FF",
+          "value": "Unsupported signal"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: No signal\n01: Signal detected\nFF: Unsupported signal"
+      ],
+      "sourceRows": [
+        580,
+        581
+      ],
+      "network": true
+    },
+    {
+      "category": "Information",
+      "function": "Confirmation source information",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SOURCELIST?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SOURCELIST?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "* Refer the \"Source code\""
+      ],
+      "sourceRows": [
+        582,
+        583
+      ],
+      "network": true
+    },
+    {
+      "category": "Information",
+      "function": "Confirmation source list",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SOURCELISTA?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SOURCELISTA?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "* Refer the \"Source code\""
+      ],
+      "sourceRows": [
+        584,
+        585
+      ],
+      "network": true
+    },
+    {
+      "category": "Information",
+      "function": "Setting/Confirmation log saving location",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "LOGTO",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "LOGTO?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LOGTO",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Internal Memory"
+        },
+        {
+          "code": "01",
+          "value": "USB and Internal Memory"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: Internal Memory\n01: USB and Internal Memory"
+      ],
+      "sourceRows": [
+        586,
+        587,
+        588
+      ],
+      "network": true
+    },
+    {
+      "category": "Information",
+      "function": "Getting serial number",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SNO?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SNO?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "SNO=x1\n  x1:Serial Number"
+      ],
+      "sourceRows": [
+        589,
+        590
+      ],
+      "network": true
+    },
+    {
+      "category": "Warning/Error",
+      "function": "Getting Error information",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ERR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ERR?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "There is no error or the error is recovered"
+        },
+        {
+          "code": "01",
+          "value": "Fan error"
+        },
+        {
+          "code": "04",
+          "value": "High internal temperature error"
+        },
+        {
+          "code": "06",
+          "value": "Laser error"
+        },
+        {
+          "code": "07",
+          "value": "Open upper case error"
+        },
+        {
+          "code": "0B",
+          "value": "Subsystem error"
+        },
+        {
+          "code": "FF",
+          "value": "Other error"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: There is no error or the error is recovered\n01: Fan error\n04: High internal temperature error\n06: Laser error\n07: Open upper case error\n0B: Subsystem error\nFF: Other error"
+      ],
+      "sourceRows": [
+        591,
+        592
+      ],
+      "network": false
+    }
+  ],
+  "keyCodes": [
+    {
+      "name": "Power",
+      "code": "01"
+    },
+    {
+      "name": "Menu",
+      "code": "03"
+    },
+    {
+      "name": "ESC",
+      "code": "05"
+    },
+    {
+      "name": "Enter",
+      "code": "16"
+    },
+    {
+      "name": "Up",
+      "code": "35"
+    },
+    {
+      "name": "Down",
+      "code": "36"
+    },
+    {
+      "name": "Left",
+      "code": "37"
+    },
+    {
+      "name": "Right",
+      "code": "38"
+    },
+    {
+      "name": "Source",
+      "code": "48"
+    },
+    {
+      "name": "Lens",
+      "code": "0E"
+    }
+  ],
+  "irCodes": [
+    {
+      "name": "Power",
+      "code": "3B"
+    },
+    {
+      "name": "Power ON",
+      "code": "A1"
+    },
+    {
+      "name": "Power OFF",
+      "code": "6C"
+    },
+    {
+      "name": "Menu",
+      "code": "3C"
+    },
+    {
+      "name": "ESC",
+      "code": "3D"
+    },
+    {
+      "name": "Enter",
+      "code": "49"
+    },
+    {
+      "name": "Pointer: Up",
+      "code": "58"
+    },
+    {
+      "name": "Pointer: Down",
+      "code": "59"
+    },
+    {
+      "name": "Pointer: Left",
+      "code": "5A"
+    },
+    {
+      "name": "Pointer: Right",
+      "code": "5B"
+    },
+    {
+      "name": "HDMI2",
+      "code": "40"
+    },
+    {
+      "name": "HDMI1",
+      "code": "4D"
+    },
+    {
+      "name": "A/V Mute",
+      "code": "3E"
+    },
+    {
+      "name": "Color Mode",
+      "code": "3F"
+    },
+    {
+      "name": "Pattern",
+      "code": "4B"
+    },
+    {
+      "name": "Aspect",
+      "code": "20"
+    },
+    {
+      "name": "Memory",
+      "code": "61"
+    },
+    {
+      "name": "Lens",
+      "code": "64"
+    },
+    {
+      "name": "Lens 1",
+      "code": "65"
+    },
+    {
+      "name": "Lens 2",
+      "code": "66"
+    },
+    {
+      "name": "Volume+",
+      "code": "56"
+    },
+    {
+      "name": "Volume-",
+      "code": "57"
+    },
+    {
+      "name": "Preview",
+      "code": "1F"
+    },
+    {
+      "name": "Default",
+      "code": "88"
+    },
+    {
+      "name": "RGBCMY",
+      "code": "89"
+    },
+    {
+      "name": "Super Res\nSuper Res/4K",
+      "code": "8C"
+    },
+    {
+      "name": "Frame Int",
+      "code": "8D"
+    },
+    {
+      "name": "HDMI Link",
+      "code": "8E"
+    },
+    {
+      "name": "Play",
+      "code": "D1"
+    },
+    {
+      "name": "Stop",
+      "code": "D2"
+    },
+    {
+      "name": "Pause",
+      "code": "D3"
+    },
+    {
+      "name": "Rewind",
+      "code": "D4"
+    },
+    {
+      "name": "Fast Forward",
+      "code": "D5"
+    },
+    {
+      "name": "Backward",
+      "code": "D6"
+    },
+    {
+      "name": "Forward",
+      "code": "D7"
+    },
+    {
+      "name": "Mute",
+      "code": "D8"
+    },
+    {
+      "name": "Link Menu",
+      "code": "D9"
+    },
+    {
+      "name": "Fine/Fast",
+      "code": "C0"
+    },
+    {
+      "name": "HDR",
+      "code": "CC"
+    },
+    {
+      "name": "Light Output",
+      "code": "DA"
+    }
+  ],
+  "sources": [
+    {
+      "sourceLabel": "INPUT3\n(DVI/HDMI)",
+      "code": 30,
+      "name": "HDMI1"
+    },
+    {
+      "sourceLabel": "Extended DVI/HDMI",
+      "code": "A0",
+      "name": "HDMI2"
+    },
+    {
+      "sourceLabel": "Change cyclic",
+      "code": "F0",
+      "name": "For all source"
+    },
+    {
+      "sourceLabel": "Change cyclic",
+      "code": "F2",
+      "name": "Video (HDMI1, HDMI2)"
+    }
+  ]
+}

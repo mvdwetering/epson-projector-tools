@@ -1,0 +1,3104 @@
+{
+  "schemaVersion": "1.0-compiled",
+  "sourceWorkbook": {
+    "fileName": "epson671640eu.xlsx",
+    "sheetName": "TW850"
+  },
+  "model": {
+    "id": "TW840",
+    "name": "TW840",
+    "aliases": [],
+    "sourceTab": "TW850",
+    "supportHeaders": [
+      "HC980",
+      "TW840"
+    ],
+    "connectivity": {
+      "rs232c": false,
+      "wiredLan": false,
+      "wirelessLan": true,
+      "usbB": false
+    }
+  },
+  "executionTimes": [
+    {
+      "item": "PWR ON",
+      "condition": "After displaying the logo",
+      "time": "30 seconds"
+    },
+    {
+      "item": "PWR OFF",
+      "condition": "Normal",
+      "time": "0 second"
+    },
+    {
+      "item": "PWR OFF",
+      "condition": "When a high temperature warning occurs",
+      "time": "20 seconds"
+    },
+    {
+      "item": "PWR OFF",
+      "condition": "When a high temperature error occurs",
+      "time": "300 seconds"
+    },
+    {
+      "item": "PWR OFF",
+      "condition": "When an error other than a high temperature error occurs",
+      "time": "90 seconds"
+    }
+  ],
+  "commands": [
+    {
+      "category": "Power Control",
+      "function": "Power On",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "PWR ON",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PWR",
+      "parameterPlaceholders": [
+        "ON"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": true,
+      "rawDetails": [],
+      "sourceRows": [
+        15
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Power Control",
+      "function": "Power Off",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "PWR OFF",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PWR",
+      "parameterPlaceholders": [
+        "OFF"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": true,
+      "rawDetails": [],
+      "sourceRows": [
+        16
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Power Control",
+      "function": "Confirmation power status",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "PWR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PWR?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Standby Mode"
+        },
+        {
+          "code": "01",
+          "value": "Normal status"
+        },
+        {
+          "code": "02",
+          "value": "Warmup"
+        },
+        {
+          "code": "03",
+          "value": "Cool down"
+        },
+        {
+          "code": "04",
+          "value": "Standby Mode  (Network ON) / Communication Standby"
+        },
+        {
+          "code": "05",
+          "value": "Abnormality standby"
+        },
+        {
+          "code": "09",
+          "value": "A/V standby / USB power standby"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": true,
+      "rawDetails": [
+        "00: Standby Mode\n01: Normal status \n02: Warmup\n03: Cool down\n04: Standby Mode  (Network ON) / Communication Standby\n05: Abnormality standby\n09: A/V standby / USB power standby"
+      ],
+      "sourceRows": [
+        17,
+        18
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Power Control",
+      "function": "Set/Confirmation sleep mode",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "SMODE x1 x2",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SMODE",
+      "parameterPlaceholders": [
+        "x1",
+        "x2"
+      ],
+      "parameterRanges": [
+        {
+          "min": "01",
+          "max": "1E"
+        }
+      ],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Sleep Mode ON"
+        },
+        {
+          "code": "01",
+          "value": "Sleep Mode OFF"
+        },
+        {
+          "code": "00",
+          "value": "Operation, Setting time"
+        },
+        {
+          "code": "01",
+          "value": "Operation, Setting time, Max setting time"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Operation\n 00: Sleep Mode ON\n 01: Sleep Mode OFF\n INIT\n\nx2: Sleep Mode Timer\n 01-1E (1-30min)",
+        "x1\n 00: Operation, Setting time\n 01: Operation, Setting time, Max setting time",
+        "y1: Setting state\n 00: Sleep Mode ON\n 01: Sleep Mode OFF\n\ny2: Setting Time\n 01-1E (1-30min)\n\ny3: Max setting time\n 01-1E (1-30min)"
+      ],
+      "sourceRows": [
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Power Control",
+      "function": "Set/Confirmation A/V Mute timer",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "MUTETIMER xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "MUTETIMER?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "MUTETIMER",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "ON"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: ON\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        33,
+        34,
+        35
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Main Unit Operation",
+      "function": "Key operation",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "KEY xx",
+      "setCommandVariants": [],
+      "setCommandNote": "*Refer to the \"Key code\"",
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "KEY",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [],
+      "sourceRows": [
+        36
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set vertical keystone correction value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "VKEYSTONE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "VKEYSTONE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "VKEYSTONE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        37,
+        38,
+        39
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set horizontal keystone correction value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "HKEYSTONE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "HKEYSTONE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "HKEYSTONE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        40,
+        41,
+        42
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set auto keystone correction",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "AUTOKEYSTONE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "AUTOKEYSTONE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "AUTOKEYSTONE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON/OFF\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        43,
+        44,
+        45
+      ],
+      "network": true,
+      "webApi": false
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set/Confirmation Quick Corner",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "QC x1 x2 x3 x4 x5 x6 x7 x8",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "QC?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "QC",
+      "parameterPlaceholders": [
+        "x1",
+        "x2",
+        "x3",
+        "x4",
+        "x5",
+        "x6",
+        "x7",
+        "x8"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "9999"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1-x8:0-9999\n This command can be set in the following turns.\n Left-top  (x, y) => Right-top  (x, y) => Right-bottom  (x, y) => Left-bottom  (x, y)",
+        "0-9999\n  The coordinates of 4 points are returned by 4lines."
+      ],
+      "sourceRows": [
+        52,
+        53,
+        54,
+        55
+      ],
+      "network": true,
+      "webApi": false
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set Quick Corner\n(Vector)",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "QCV x1 x2 x3 x4 x5 x6 x7 x8",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "QCV",
+      "parameterPlaceholders": [
+        "x1",
+        "x2",
+        "x3",
+        "x4",
+        "x5",
+        "x6",
+        "x7",
+        "x8"
+      ],
+      "parameterRanges": [
+        {
+          "min": "99",
+          "max": "99"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1-x8: -99-99\n This command can be set in the following turns.\n Left-top  (x, y) => Right-top  (x, y) => Right-bottom  (x, y) => Left-bottom  (x, y)"
+      ],
+      "sourceRows": [
+        68,
+        69
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set Quick Corner (Coordinates movement)",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "QCMV control direction movement",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "QCMV",
+      "parameterPlaceholders": [
+        "control",
+        "direction",
+        "movement"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "Left-Top"
+        },
+        {
+          "code": "02",
+          "value": "Right-Top"
+        },
+        {
+          "code": "03",
+          "value": "Right-bottom"
+        },
+        {
+          "code": "04",
+          "value": "Left-bottom"
+        },
+        {
+          "code": "INIT",
+          "value": "(Setting only)"
+        },
+        {
+          "code": "01",
+          "value": "move to upper"
+        },
+        {
+          "code": "02",
+          "value": "move to lower"
+        },
+        {
+          "code": "03",
+          "value": "move to left"
+        },
+        {
+          "code": "04",
+          "value": "move to right"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "control: Assign Quick Corner control position\n 01: Left-Top\n 02: Right-Top\n 03: Right-bottom\n 04: Left-bottom\n INIT:  (Setting only)\n\ndirection: Assign direction\n 01: move to upper\n 02: move to lower\n 03: move to left\n 04: move to right\n\nmovement: input the movement value\n Only \"INC\" command is available.  (Setting only)"
+      ],
+      "sourceRows": [
+        70,
+        71
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set H-Keystone adjuster",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SLIDEKEYSTONE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SLIDEKEYSTONE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SLIDEKEYSTONE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "ON"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: ON\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        72,
+        73,
+        74
+      ],
+      "network": true,
+      "webApi": false
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Confirmation of correction function Set",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CORRECTMET x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CORRECTMET?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CORRECTMET",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "H/V keystone"
+        },
+        {
+          "code": "02",
+          "value": "Quick Corner"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: H/V keystone\n02: Quick Corner"
+      ],
+      "sourceRows": [
+        75,
+        76,
+        77
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set Aspect ratio",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "ASPECT xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ASPECT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ASPECT",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "30",
+          "value": "Auto"
+        },
+        {
+          "code": "40",
+          "value": "Full"
+        },
+        {
+          "code": "50",
+          "value": "Zoom"
+        },
+        {
+          "code": "60",
+          "value": "Native"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "30: Auto\n   40: Full\n   50: Zoom\n   60: Native\n  INIT  (Setting only)",
+        "<Auto>\n  x1: mode\n  x2: Parameter of \"Auto\" =30"
+      ],
+      "sourceRows": [
+        135,
+        136,
+        137,
+        140
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Changing Luminance",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "LUMINANCE xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "LUMINANCE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LUMINANCE",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "High"
+        },
+        {
+          "code": "01",
+          "value": "Eco"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: High\n01: Eco\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        147,
+        148,
+        149
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Projection screen adjustment",
+      "function": "Set Tele/Wide value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "ZOOM xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ZOOM?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ZOOM",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": true,
+      "rawDetails": [
+        "E-Zoom (Zoom in/Zoom out)\n  0-255\n  INIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        165,
+        166,
+        167
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Changing Source/Input resolution setting",
+      "function": "Selecting/Confirmation input source",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "SOURCE xx",
+      "setCommandVariants": [],
+      "setCommandNote": "* Refer to the \"Source code\"",
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SOURCE",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [],
+      "sourceRows": [
+        201,
+        202
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Changing Source/Input resolution setting",
+      "function": "Auto source search",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "AUTOSEARCH x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "AUTOSEARCH?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "AUTOSEARCH",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Off"
+        },
+        {
+          "code": "01",
+          "value": "ON"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00:Off\n01:ON"
+      ],
+      "sourceRows": [
+        206,
+        207,
+        208
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation brightness value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "BRIGHT xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "BRIGHT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "BRIGHT",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        217,
+        218,
+        219
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation contrast value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CONTRAST xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CONTRAST?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CONTRAST",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        220,
+        221,
+        222
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation density value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "DENSITY xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "DENSITY?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "DENSITY",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        223,
+        224,
+        225
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation tint value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "TINT xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "TINT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "TINT",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        226,
+        227,
+        228
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation sharpness value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SHARP x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SHARP?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SHARP",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Adjustment Value\n  0-255\n  INC/DEC/INIT",
+        "0-255"
+      ],
+      "sourceRows": [
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235
+      ],
+      "network": true,
+      "webApi": false
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation color temperature value",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CTEMP xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CTEMP?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CTEMP",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "Absolute color temperature\n  0-255\n  INIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        245,
+        246,
+        247
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation color mode",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "CMODE xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CMODE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CMODE",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "06",
+          "value": "Dynamic"
+        },
+        {
+          "code": "07",
+          "value": "Natural"
+        },
+        {
+          "code": "15",
+          "value": "Cinema"
+        },
+        {
+          "code": "23",
+          "value": "Vivid"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "06: Dynamic\n07: Natural\n15: Cinema\n23: Vivid\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        251,
+        252,
+        253
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation noise reduction adjustment",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "NRS xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "NRS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "NRS",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC",
+        "0-255"
+      ],
+      "sourceRows": [
+        267,
+        268,
+        269,
+        270
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation offset value (Red/Blue/Green)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "OFFSETR xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "OFFSETR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "OFFSETR",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)",
+        "0-255\nINIT/INC/DEC  (Setting only)",
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        280,
+        281,
+        282,
+        283,
+        284,
+        285,
+        286,
+        287,
+        288
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation gain value (Red/Blue/Green)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "GAINR xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "GAINR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "GAINR",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)",
+        "0-255\nINIT/INC/DEC  (Setting only)",
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        296,
+        297
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Confirmation of the color",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "CSEL?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "CSEL?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "07",
+          "value": "RGB/RGBCMY"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "07: RGB/RGBCMY"
+      ],
+      "sourceRows": [
+        326,
+        327
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Strength Set of Detail enhancement",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "DESTRENGTH x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "DESTRENGTH",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINC/DEC/INIT",
+        "0-255"
+      ],
+      "sourceRows": [
+        356,
+        357,
+        358,
+        359
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation scene adaptive gamma set",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SCENEGAMMA x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SCENEGAMMA?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SCENEGAMMA",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC (Setting only)"
+      ],
+      "sourceRows": [
+        392,
+        393,
+        394
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Image setting",
+      "function": "Set/Confirmation Deinterlacing",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "IPS xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "IPS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "IPS",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "OFF"
+        },
+        {
+          "code": "02",
+          "value": "Video"
+        },
+        {
+          "code": "03",
+          "value": "Film/Auto"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: OFF\n02: Video\n03: Film/Auto\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        401,
+        402,
+        403
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Sound",
+      "function": "Set/Confirmation volume",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "VOL xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "VOL?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "VOL",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "0",
+          "max": "255"
+        }
+      ],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": true,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "0-255\nINIT/INC/DEC  (Setting only)"
+      ],
+      "sourceRows": [
+        443,
+        444,
+        445
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Sound",
+      "function": "Set/Confirmation AV output",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "AVOUT x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "AVOUT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "AVOUT",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "While projecting"
+        },
+        {
+          "code": "01",
+          "value": "Always  (A/V Standby)"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: While projecting\n 01: Always  (A/V Standby)\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        468,
+        469,
+        470
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Unique function",
+      "function": "Set/Confirmation A/V mute",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "MUTE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "MUTE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "MUTE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON :Execute \"A/V mute\"\nOFF: Cancel \"A/V mute\"\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        486,
+        487,
+        488
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Unique function",
+      "function": "Set/Confirmation freeze function",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "FREEZE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "FREEZE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "FREEZE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON :Execute \"Freeze\"\nOFF: Cancel \"Freeze\"\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        489,
+        490,
+        491
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Unique function",
+      "function": "Split screen function",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SPS x1 x2",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SPS?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SPS",
+      "parameterPlaceholders": [
+        "x1",
+        "x2"
+      ],
+      "parameterRanges": [
+        {
+          "min": "01",
+          "max": "04"
+        }
+      ],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "All settings"
+        },
+        {
+          "code": "01",
+          "value": "Split screen (2 screens)"
+        },
+        {
+          "code": "02",
+          "value": "Screen size"
+        },
+        {
+          "code": "03",
+          "value": "Source of left screen"
+        },
+        {
+          "code": "04",
+          "value": "Source of right screen"
+        },
+        {
+          "code": "06",
+          "value": "Audio output"
+        },
+        {
+          "code": "0B",
+          "value": "Screen position"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "SPS 01 00 : Split screen (2 screens) OFF\n       01 01 : Split screen (2 screens) ON\n\nSPS 02 00 : Both screen size are same\n       02 01 : Left screen become bigger than right\n       02 02 : Right screen become bigger than left\n\nSPS 03 xx : Source change of left screen *1\n\nSPS 04 xx : Source change of right screen *1\n\nSPS 05: Switch left and right screen.\n\nSPS 06 00: Audio output: Auto *2\n       06 01: Left screen's audio output\n       06 02: Right screen's audio output\n\nSPS 0B 00: Screen position: Top\n       0B 01: Screen position: Middle\n\n*1 Please refer the \"source code\"\n*2 Audio is output from the enlarged screen. If both screen size are same, audio is output from the left screen.",
+        "00: All settings\n01: Split screen (2 screens)\n02: Screen size\n03: Source of left screen\n04: Source of right screen\n06: Audio output\n0B: Screen position",
+        "x1=00:\nReturns the values to be obtained for each parameter of 01-04, 06 in parameter order.\n\nX1=01-04, 06, 0B\nPlease refer the parameter of SPS"
+      ],
+      "sourceRows": [
+        526,
+        527,
+        528,
+        529,
+        530
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation the reverse image (Horizontal)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "HREVERSE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "HREVERSE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "HREVERSE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON : Flip horizontal\nOFF: Normal position\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        531,
+        532,
+        533
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation the reverse image (Vertical)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "VREVERSE xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "VREVERSE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "VREVERSE",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON : Flip vertical\nOFF: Normal position\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        534,
+        535,
+        536
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Selecting/Confirmation background color\n(A/V Mute display screen)",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "MSEL xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "MSEL?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "MSEL",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Black"
+        },
+        {
+          "code": "01",
+          "value": "Blue"
+        },
+        {
+          "code": "02",
+          "value": "User logo"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00:Black\n 01:Blue\n 02:User logo\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        540,
+        541,
+        542
+      ],
+      "network": true,
+      "webApi": false
+    },
+    {
+      "category": "Environment setting",
+      "function": "Reset All",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "INITALL",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "INITALL",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [],
+      "sourceRows": [
+        543
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Selecting/Confirmation Communication Speed",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SPEED xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SPEED?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SPEED",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00\uff1a9600bps\n01\uff1a19200bps\n02\uff1a38400bps\n03\uff1a57600bps\nINIT",
+        "00\uff1a9600bps\n01\uff1a19200bps\n02\uff1a38400bps\n03\uff1a57600bps"
+      ],
+      "sourceRows": [
+        552,
+        553,
+        554,
+        555
+      ],
+      "network": false,
+      "webApi": false
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation projector ID",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "PROJID xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "PROJID?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PROJID",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [
+        {
+          "min": "01",
+          "max": "09"
+        }
+      ],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01-09: ID1-ID9\nINIT  (Setting only)"
+      ],
+      "sourceRows": [
+        556,
+        557,
+        558
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set ECO display",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "PSDISP mode",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "PSDISP?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "PSDISP",
+      "parameterPlaceholders": [
+        "mode"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Off"
+        },
+        {
+          "code": "01",
+          "value": "On"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: Off\n 01: On"
+      ],
+      "sourceRows": [
+        617,
+        618,
+        619
+      ],
+      "network": true,
+      "webApi": false
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation batch setup range",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "BARANGE x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "BARANGE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "BARANGE",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "ALL"
+        },
+        {
+          "code": "01",
+          "value": "Limited"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: ALL\n01: Limited"
+      ],
+      "sourceRows": [
+        643,
+        644,
+        645
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation USB power delivery",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "USBSUPPLY x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "USBSUPPLY?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "USBSUPPLY",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "While projecting"
+        },
+        {
+          "code": "01",
+          "value": "Always"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: While projecting\n01: Always"
+      ],
+      "sourceRows": [
+        667,
+        668,
+        669
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation language",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "LANG xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "LANG?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LANG",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "English        09: Korean"
+        },
+        {
+          "code": "02",
+          "value": "Japanese     16: Traditional Chinese"
+        },
+        {
+          "code": "03",
+          "value": "French         1B: Thai"
+        },
+        {
+          "code": "04",
+          "value": "German       1C: Indonesian"
+        },
+        {
+          "code": "05",
+          "value": "Italian          20: Malay"
+        },
+        {
+          "code": "06",
+          "value": "Spanish        21: Vietnamese"
+        },
+        {
+          "code": "07",
+          "value": "Portuguese   23: Hindi"
+        },
+        {
+          "code": "08",
+          "value": "Simplified Chinese"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "<15 languages available>\n01: English        09: Korean\n02: Japanese     16: Traditional Chinese\n03: French         1B: Thai\n04: German       1C: Indonesian\n05: Italian          20: Malay\n06: Spanish        21: Vietnamese\n07: Portuguese   23: Hindi\n08: Simplified Chinese\n\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        690,
+        691,
+        692,
+        693,
+        694,
+        695
+      ],
+      "network": false,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation messages",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "IPROMPT x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "IPROMPT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "IPROMPT",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON: Message ON\nOFF: Message OFF\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        696,
+        697,
+        698
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Selecting/Confirmation background color",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "NOSEL xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "NOSEL?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "NOSEL",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "Black"
+        },
+        {
+          "code": "02",
+          "value": "Blue"
+        },
+        {
+          "code": "03",
+          "value": "Logo"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "01: Black\n02: Blue\n03: Logo\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        699,
+        700,
+        701
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation startup screen",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SCREEN x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SCREEN?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SCREEN",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON: Startup screen ON\nOFF: Startup screen OFF\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        702,
+        703,
+        704
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/ Confirmation remote control receiver Set",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "RCLT xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "RCLT?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "RCLT",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Turn OFF the front/rear receiver"
+        },
+        {
+          "code": "01",
+          "value": "Turn ON the only front receiver"
+        },
+        {
+          "code": "02",
+          "value": "Turn ON the only rear receiver"
+        },
+        {
+          "code": "03",
+          "value": "Turn ON the front/rear receiver"
+        },
+        {
+          "code": "FF",
+          "value": "Turn ON the all receiver (setting only)"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: Turn OFF the front/rear receiver\n01: Turn ON the only front receiver\n02: Turn ON the only rear receiver\n03: Turn ON the front/rear receiver\nFF: Turn ON the all receiver (setting only)\nINIT (setting only)"
+      ],
+      "sourceRows": [
+        705,
+        706,
+        707
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation direct power on",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "DIRECTON xxx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "DIRECTON?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "DIRECTON",
+      "parameterPlaceholders": [
+        "xxx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON: Enable \"Direct Power On\"\nOFF: Disable \"Direct Power On\"\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        712,
+        713,
+        714
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation auto power on",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "AUTOPWRON x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "AUTOPWRON?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "AUTOPWRON",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "30",
+          "value": "HDMI1"
+        },
+        {
+          "code": "31",
+          "value": "Signal detection of HDMI1"
+        },
+        {
+          "code": "51",
+          "value": "USB Display"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n30: HDMI1\n31: Signal detection of HDMI1\n51: USB Display"
+      ],
+      "sourceRows": [
+        715,
+        716,
+        717
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation standby mode",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "SPOWER x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SPOWER?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SPOWER",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ON: Communication ON\nOFF: Communication OFF\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        718,
+        719,
+        720
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Setting User button function",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "BUTALLOC button function",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "BUTALLOC",
+      "parameterPlaceholders": [
+        "button",
+        "function"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "84",
+          "value": "User Button"
+        },
+        {
+          "code": "00",
+          "value": "Light Source Mode"
+        },
+        {
+          "code": "01",
+          "value": "Information"
+        },
+        {
+          "code": "02",
+          "value": "Deinterlacing"
+        },
+        {
+          "code": "04",
+          "value": "Test Pattern"
+        },
+        {
+          "code": "08",
+          "value": "Pattern Guide"
+        },
+        {
+          "code": "19",
+          "value": "Display the QR code"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "button\n 84: User Button\n\nfunction\n 00: Light Source Mode\n 01: Information\n 02: Deinterlacing\n 04: Test Pattern\n 08: Pattern Guide\n 19: Display the QR code\n INIT (Setting only)"
+      ],
+      "sourceRows": [
+        727,
+        728,
+        729
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Environment setting",
+      "function": "Set/Confirmation High altitude mode",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "ALTITUDE mode",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ALTITUDE?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ALTITUDE",
+      "parameterPlaceholders": [
+        "mode"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "ON"
+        }
+      ],
+      "initSupported": true,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: ON\nINIT (Setting only)"
+      ],
+      "sourceRows": [
+        734,
+        735,
+        736
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Home\u3000Screen",
+      "function": "Set/Confirmation Home screen auto display",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "AUTOHOME x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "AUTOHOME?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "AUTOHOME",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "ON"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: ON"
+      ],
+      "sourceRows": [
+        743,
+        744,
+        745
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Home\u3000Screen",
+      "function": "Set/Confirmation home Set custom function",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "HFUNC x1 x2",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "HFUNC",
+      "parameterPlaceholders": [
+        "x1",
+        "x2"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "01",
+          "value": "Custom1  (L2)"
+        },
+        {
+          "code": "02",
+          "value": "Custom2  (R2)"
+        },
+        {
+          "code": "00",
+          "value": "Color Mode"
+        },
+        {
+          "code": "01",
+          "value": "Lamp consumption"
+        },
+        {
+          "code": "02",
+          "value": "Test Pattern"
+        },
+        {
+          "code": "03",
+          "value": "Network Settings"
+        },
+        {
+          "code": "04",
+          "value": "Eco Settings"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1 = Custom target\n 01: Custom1  (L2)\n 02: Custom2  (R2)\n\nx2 = Function\n 00: Color Mode\n 01: Lamp consumption\n 02: Test Pattern\n 03: Network Settings\n 04: Eco Settings"
+      ],
+      "sourceRows": [
+        746,
+        747,
+        748
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Network setting",
+      "function": "Set Wireless LAN power",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "WLPWR x1",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "WLPWR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "WLPWR",
+      "parameterPlaceholders": [
+        "x1"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "OFF"
+        },
+        {
+          "code": "01",
+          "value": "Wireless LAN ON"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: OFF\n01: Wireless LAN ON"
+      ],
+      "sourceRows": [
+        763,
+        764,
+        765
+      ],
+      "network": false,
+      "webApi": true
+    },
+    {
+      "category": "Information",
+      "function": "Set lamp operation time",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "LAMP?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LAMP?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "x1: Lamp operation time"
+      ],
+      "sourceRows": [
+        823,
+        824
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Information",
+      "function": "Set operation time",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ONTIME?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ONTIME?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "ONTIME=x1\n x1: Operation Time"
+      ],
+      "sourceRows": [
+        825,
+        826
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Information",
+      "function": "Signal status",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SIGNAL?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SIGNAL?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "No signal"
+        },
+        {
+          "code": "01",
+          "value": "Signal detected"
+        },
+        {
+          "code": "FF",
+          "value": "Unsupported signal"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: No signal\n01: Signal detected\nFF: Unsupported signal"
+      ],
+      "sourceRows": [
+        827,
+        828
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Information",
+      "function": "Confirmation source information",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SOURCELIST?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SOURCELIST?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "* Refer the \"Source code\""
+      ],
+      "sourceRows": [
+        829,
+        830
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Information",
+      "function": "Confirmation source list",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SOURCELISTA?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SOURCELISTA?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "* Refer the \"Source code\""
+      ],
+      "sourceRows": [
+        831,
+        832
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Information",
+      "function": "Set/Confirmation log saving location",
+      "canSet": true,
+      "canQuery": true,
+      "setCommand": "LOGTO",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "LOGTO?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "LOGTO",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Internal Memory"
+        },
+        {
+          "code": "01",
+          "value": "USB and Internal Memory"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: Internal Memory\n01: USB and Internal Memory"
+      ],
+      "sourceRows": [
+        833,
+        834,
+        835
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Information",
+      "function": "Set serial number",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "SNO?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "SNO?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "SNO=x1\n  x1:Serial Number"
+      ],
+      "sourceRows": [
+        836,
+        837
+      ],
+      "network": true,
+      "webApi": false
+    },
+    {
+      "category": "Information",
+      "function": "Confirmation Info menu",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "MENUINFO? xx",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "MENUINFO?",
+      "parameterPlaceholders": [
+        "xx"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "All data"
+        },
+        {
+          "code": "01",
+          "value": "Status"
+        },
+        {
+          "code": "05",
+          "value": "Event ID"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: All data\n01: Status\n05: Event ID"
+      ],
+      "sourceRows": [
+        840,
+        841
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Function Control",
+      "function": "Confirmation Test Pattern mode",
+      "canSet": true,
+      "canQuery": false,
+      "setCommand": "TESTPATTERN mode [pattern]",
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": null,
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "TESTPATTERN",
+      "parameterPlaceholders": [
+        "mode",
+        "[pattern]"
+      ],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "Test Pattern OFF"
+        },
+        {
+          "code": "01",
+          "value": "Test Pattern ON"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "mode\n 00: Test Pattern OFF\n 01: Test Pattern ON"
+      ],
+      "sourceRows": [
+        845,
+        846
+      ],
+      "network": true,
+      "webApi": true
+    },
+    {
+      "category": "Warning/Error",
+      "function": "Getting Error information",
+      "canSet": false,
+      "canQuery": true,
+      "setCommand": null,
+      "setCommandVariants": [],
+      "setCommandNote": null,
+      "queryCommand": "ERR?",
+      "queryCommandVariants": [],
+      "queryCommandNote": null,
+      "commandToken": "ERR?",
+      "parameterPlaceholders": [],
+      "parameterRanges": [],
+      "enumValues": [
+        {
+          "code": "00",
+          "value": "There is no error or the error is recovered"
+        },
+        {
+          "code": "01",
+          "value": "Fan error"
+        },
+        {
+          "code": "04",
+          "value": "High internal temperature error"
+        },
+        {
+          "code": "06",
+          "value": "Laser error"
+        },
+        {
+          "code": "0A",
+          "value": "Auto iris error"
+        },
+        {
+          "code": "0E",
+          "value": "Power supply unit error (Ballast)"
+        },
+        {
+          "code": "FF",
+          "value": "Other error"
+        }
+      ],
+      "initSupported": false,
+      "incDecSupported": false,
+      "minMaxSupported": false,
+      "operationPassword": false,
+      "rawDetails": [
+        "00: There is no error or the error is recovered\n01: Fan error\n04: High internal temperature error\n06: Laser error\n0A: Auto iris error\n0E: Power supply unit error (Ballast)\nFF: Other error"
+      ],
+      "sourceRows": [
+        853,
+        854
+      ],
+      "network": false,
+      "webApi": false
+    }
+  ],
+  "keyCodes": [
+    {
+      "name": "Power",
+      "code": "01"
+    },
+    {
+      "name": "Menu",
+      "code": "03"
+    },
+    {
+      "name": "Home",
+      "code": "04"
+    },
+    {
+      "name": "ESC",
+      "code": "05"
+    },
+    {
+      "name": "Enter",
+      "code": "16"
+    },
+    {
+      "name": "Up",
+      "code": "35"
+    },
+    {
+      "name": "Down",
+      "code": "36"
+    },
+    {
+      "name": "Left",
+      "code": "37"
+    },
+    {
+      "name": "Right",
+      "code": "38"
+    },
+    {
+      "name": "Source Search",
+      "code": "48"
+    }
+  ],
+  "irCodes": [
+    {
+      "name": "Power",
+      "code": "3B"
+    },
+    {
+      "name": "Power ON",
+      "code": "A1"
+    },
+    {
+      "name": "Power OFF",
+      "code": "6C"
+    },
+    {
+      "name": "Menu",
+      "code": "3C"
+    },
+    {
+      "name": "ESC",
+      "code": "3D"
+    },
+    {
+      "name": "Enter",
+      "code": "49"
+    },
+    {
+      "name": "Pointer: Up",
+      "code": "58"
+    },
+    {
+      "name": "Pointer: Down",
+      "code": "59"
+    },
+    {
+      "name": "Pointer: Left",
+      "code": "5A"
+    },
+    {
+      "name": "Pointer: Right",
+      "code": "5B"
+    },
+    {
+      "name": "Auto",
+      "code": "4A"
+    },
+    {
+      "name": "Comp1(Computer)",
+      "code": "43"
+    },
+    {
+      "name": "SourceSearch",
+      "code": "67"
+    },
+    {
+      "name": "HDMI",
+      "code": "4D"
+    },
+    {
+      "name": "LAN",
+      "code": "8A"
+    },
+    {
+      "name": "USB",
+      "code": "85"
+    },
+    {
+      "name": "Freeze",
+      "code": "47"
+    },
+    {
+      "name": "E-Zoom+",
+      "code": "28"
+    },
+    {
+      "name": "E-Zoom-",
+      "code": "29"
+    },
+    {
+      "name": "A/V Mute",
+      "code": "3E"
+    },
+    {
+      "name": "Color Mode",
+      "code": "3F"
+    },
+    {
+      "name": "Aspect",
+      "code": "20"
+    },
+    {
+      "name": "Volume+",
+      "code": "56"
+    },
+    {
+      "name": "Volume-",
+      "code": "57"
+    },
+    {
+      "name": "User",
+      "code": "84"
+    },
+    {
+      "name": "Default",
+      "code": "88"
+    },
+    {
+      "name": "ID",
+      "code": "8F"
+    },
+    {
+      "name": "Split",
+      "code": "A0"
+    }
+  ],
+  "sources": [
+    {
+      "sourceLabel": "INPUT3\n(DVI/HDMI)",
+      "code": 30,
+      "name": "HDMI1"
+    },
+    {
+      "sourceLabel": "EasyMP",
+      "code": "51",
+      "name": "USB Display"
+    },
+    {
+      "sourceLabel": "EasyMP",
+      "code": "52",
+      "name": "USB"
+    },
+    {
+      "sourceLabel": "EasyMP",
+      "code": "53",
+      "name": "LAN"
+    },
+    {
+      "sourceLabel": "Extended DVI/HDMI",
+      "code": "A0",
+      "name": "HDMI2"
+    },
+    {
+      "sourceLabel": "Change cyclic",
+      "code": "F0",
+      "name": "For all source"
+    },
+    {
+      "sourceLabel": "Change cyclic",
+      "code": "F1",
+      "name": "PC"
+    },
+    {
+      "sourceLabel": "Change cyclic",
+      "code": "F2",
+      "name": "Video"
+    }
+  ]
+}

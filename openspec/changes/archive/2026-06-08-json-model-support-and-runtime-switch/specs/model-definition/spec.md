@@ -1,6 +1,6 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
-### Requirement: JSON model file format
+### Requirement: YAML model file format
 Each model SHALL be defined in a JSON file under `models/` with the following structure:
 - `model`: object with model identity fields (`id`, `name`, optional aliases/support headers) and `connectivity`.
 - `commands`: list of command rows exported from workbook data.

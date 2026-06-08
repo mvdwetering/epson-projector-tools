@@ -13,7 +13,7 @@ from transports.http import HttpTransport
 
 class HttpTransportJsonQueryShapeTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self) -> None:
-        model_path = Path(__file__).resolve().parents[1] / "models" / "eh_tw3200.yaml"
+        model_path = Path(__file__).resolve().parents[1] / "models" / "TW3200.json"
         self.model = load_model(model_path)
         self.state = ProjectorState(self.model)
         self.transport = HttpTransport(self.state, self.model)
