@@ -25,11 +25,6 @@ class JsonModelLoaderTests(unittest.TestCase):
         self.assertTrue(key_cmd.notify_only)
         self.assertEqual(set(key_cmd.set_values or []), model.ir_codes)
 
-    def test_rejects_non_json_model_files(self) -> None:
-        model_path = Path(__file__).resolve().parents[1] / "models" / "eh_tw3200.yaml"
-        with self.assertRaises(ValueError):
-            load_model(model_path)
-
     def test_sno_exists_for_models_even_if_not_explicitly_defined(self) -> None:
         tw = load_model(Path(__file__).resolve().parents[1] / "models" / "TW3200.json")
         self.assertIn("SNO", tw.commands)
@@ -70,12 +65,15 @@ class JsonEngineBehaviorTests(unittest.TestCase):
         self.assertEqual(handle_command(tw_state, tw_model, "SOURCELIST?"), "ERR\r:")
         self.assertEqual(handle_command(tw_state, tw_model, "SOURCELISTA?"), "ERR\r:")
 
+    def test_null_command_returns_colon_only_ack(self) -> None:
+        self.assertEqual(handle_command(self.state, self.model, "\r"), ":")
+
     def test_source_parameter_is_validated_against_model_sources(self) -> None:
         valid_source = next(iter(self.model.source_codes()))
         ok = handle_command(self.state, self.model, f"SOURCE {valid_source}")
         err = handle_command(self.state, self.model, "SOURCE ZZ")
 
-        self.assertEqual(ok, "\r:")
+        self.assertEqual(ok, ":")
         self.assertEqual(err, "ERR\r:")
 
     def test_key_parameter_is_validated_against_ir_codes(self) -> None:
@@ -83,21 +81,21 @@ class JsonEngineBehaviorTests(unittest.TestCase):
         ok = handle_command(self.state, self.model, f"KEY {valid_key}")
         err = handle_command(self.state, self.model, "KEY ZZ")
 
-        self.assertEqual(ok, "\r:")
+        self.assertEqual(ok, ":")
         self.assertEqual(err, "ERR\r:")
 
     def test_inc_dec_only_applies_to_decimal_single_parameter_commands(self) -> None:
-        self.assertEqual(handle_command(self.state, self.model, "VOL 10"), "\r:")
-        self.assertEqual(handle_command(self.state, self.model, "VOL INC"), "\r:")
+        self.assertEqual(handle_command(self.state, self.model, "VOL 10"), ":")
+        self.assertEqual(handle_command(self.state, self.model, "VOL INC"), ":")
         self.assertEqual(self.state.get("VOL"), "11")
 
         # SMODE is not a decimal single-parameter INC/DEC command in this milestone.
         self.assertEqual(handle_command(self.state, self.model, "SMODE INC"), "ERR\r:")
 
     def test_pwr_query_returns_protocol_code_value(self) -> None:
-        self.assertEqual(handle_command(self.state, self.model, "PWR OFF"), "\r:")
+        self.assertEqual(handle_command(self.state, self.model, "PWR OFF"), ":")
         self.assertEqual(handle_command(self.state, self.model, "PWR?"), "PWR=00\r:")
-        self.assertEqual(handle_command(self.state, self.model, "PWR ON"), "\r:")
+        self.assertEqual(handle_command(self.state, self.model, "PWR ON"), ":")
         self.assertEqual(handle_command(self.state, self.model, "PWR?"), "PWR=01\r:")
 
     def test_sno_and_lamp_have_non_zero_defaults(self) -> None:

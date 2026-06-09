@@ -9,7 +9,7 @@ from projector.state import ProjectorState
 _SET_RE = re.compile(r"^(?P<cmd>[A-Za-z0-9]+) (?P<val>.*)$")
 _GET_RE = re.compile(r"^(?P<cmd>[A-Za-z0-9]+)\?$")
 
-_OK = "\r:"
+_OK = ":"
 _ERR = "ERR\r:"
 
 
@@ -20,7 +20,7 @@ def handle_command(state: ProjectorState, model: ModelDef, cmd_str: str) -> str:
     This is a pure function: it mutates `state` but performs no I/O.
     Response format:
       - GET success : "CMD=value\\r:"
-      - SET / null  : "\\r:"
+      - SET / null  : ":"
       - Error       : "ERR\\r:"
     """
     line = cmd_str.strip()
