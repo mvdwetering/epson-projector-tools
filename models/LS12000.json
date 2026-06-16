@@ -3455,24 +3455,33 @@
   ],
   "sources": [
     {
-      "sourceLabel": "INPUT3\n(DVI/HDMI)",
-      "code": 30,
-      "name": "HDMI1"
+      "sourceGroup": "INPUT3",
+      "type": "direct",
+      "code": "30",
+      "sourceGroupDescription": "DVI/HDMI",
+      "sourceName": "HDMI1"
     },
     {
-      "sourceLabel": "Extended DVI/HDMI",
+      "sourceGroup": "Extended DVI/HDMI",
+      "type": "direct",
       "code": "A0",
-      "name": "HDMI2"
+      "sourceName": "HDMI2"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F0",
-      "name": "For all source"
+      "codeContext": "For all source"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F2",
-      "name": "Video (HDMI1, HDMI2)"
+      "codeContext": "Video",
+      "sourceNames": [
+        "HDMI1",
+        "HDMI2"
+      ]
     }
   ]
 }

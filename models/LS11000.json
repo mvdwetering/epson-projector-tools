@@ -259,202 +259,6 @@
     },
     {
       "category": "Projection screen adjustment",
-      "function": "Setting Quick Corner",
-      "canSet": true,
-      "canQuery": true,
-      "setCommand": "QC x1 x2 x3 x4 x5 x6 x7 x8",
-      "setCommandVariants": [],
-      "setCommandNote": null,
-      "queryCommand": "QC?",
-      "queryCommandVariants": [],
-      "queryCommandNote": null,
-      "commandToken": "QC",
-      "parameterPlaceholders": [
-        "x1",
-        "x2",
-        "x3",
-        "x4",
-        "x5",
-        "x6",
-        "x7",
-        "x8"
-      ],
-      "parameterRanges": [
-        {
-          "min": "0",
-          "max": "9999"
-        }
-      ],
-      "enumValues": [],
-      "initSupported": false,
-      "incDecSupported": false,
-      "minMaxSupported": false,
-      "operationPassword": false,
-      "rawDetails": [
-        "x1-x8:0-9999\n This command can be set in the following turns.\n Left-top  (x, y) => Right-top  (x, y) => Right-bottom  (x, y) => Left-bottom  (x, y)",
-        "0-9999\n  The coordinates of 4 points are returned by 4lines."
-      ],
-      "sourceRows": [
-        35,
-        36,
-        37,
-        38
-      ],
-      "network": true
-    },
-    {
-      "category": "Projection screen adjustment",
-      "function": "Setting Quick Corner (Vector)",
-      "canSet": true,
-      "canQuery": false,
-      "setCommand": "QCV x1 x2 x3 x4 x5 x6 x7 x8",
-      "setCommandVariants": [],
-      "setCommandNote": null,
-      "queryCommand": null,
-      "queryCommandVariants": [],
-      "queryCommandNote": null,
-      "commandToken": "QCV",
-      "parameterPlaceholders": [
-        "x1",
-        "x2",
-        "x3",
-        "x4",
-        "x5",
-        "x6",
-        "x7",
-        "x8"
-      ],
-      "parameterRanges": [
-        {
-          "min": "99",
-          "max": "99"
-        }
-      ],
-      "enumValues": [],
-      "initSupported": false,
-      "incDecSupported": false,
-      "minMaxSupported": false,
-      "operationPassword": false,
-      "rawDetails": [
-        "x1-x8: -99-99\n This command can be set in the following turns.\n Left-top  (x, y) => Right-top  (x, y) => Right-bottom  (x, y) => Left-bottom  (x, y)"
-      ],
-      "sourceRows": [
-        39,
-        40
-      ],
-      "network": true
-    },
-    {
-      "category": "Projection screen adjustment",
-      "function": "Setting Quick Corner (Coordinates movement)",
-      "canSet": true,
-      "canQuery": false,
-      "setCommand": "QCMV control direction movement",
-      "setCommandVariants": [],
-      "setCommandNote": null,
-      "queryCommand": null,
-      "queryCommandVariants": [],
-      "queryCommandNote": null,
-      "commandToken": "QCMV",
-      "parameterPlaceholders": [
-        "control",
-        "direction",
-        "movement"
-      ],
-      "parameterRanges": [],
-      "enumValues": [
-        {
-          "code": "01",
-          "value": "Left-Top"
-        },
-        {
-          "code": "02",
-          "value": "Right-Top"
-        },
-        {
-          "code": "03",
-          "value": "Right-bottom"
-        },
-        {
-          "code": "04",
-          "value": "Left-bottom"
-        },
-        {
-          "code": "INIT",
-          "value": "(Setting only)"
-        },
-        {
-          "code": "01",
-          "value": "move to upper"
-        },
-        {
-          "code": "02",
-          "value": "move to lower"
-        },
-        {
-          "code": "03",
-          "value": "move to left"
-        }
-      ],
-      "initSupported": true,
-      "incDecSupported": false,
-      "minMaxSupported": false,
-      "operationPassword": false,
-      "rawDetails": [
-        "control: Assign Quick Corner control position\n    01: Left-Top\n    02: Right-Top\n    03: Right-bottom\n    04: Left-bottom\n    INIT:  (Setting only)\n\ndirection: Assign direction\n    01: move to upper\n    02: move to lower\n    03: move to left\n    04. move to right\n\nmovement: input the movement value\n    Only \"INC\" command is available.  (Setting only)"
-      ],
-      "sourceRows": [
-        41,
-        42
-      ],
-      "network": true
-    },
-    {
-      "category": "Projection screen adjustment",
-      "function": "Confirmation of correction function setting",
-      "canSet": true,
-      "canQuery": true,
-      "setCommand": "CORRECTMET x1",
-      "setCommandVariants": [],
-      "setCommandNote": null,
-      "queryCommand": "CORRECTMET?",
-      "queryCommandVariants": [],
-      "queryCommandNote": null,
-      "commandToken": "CORRECTMET",
-      "parameterPlaceholders": [
-        "x1"
-      ],
-      "parameterRanges": [],
-      "enumValues": [
-        {
-          "code": "01",
-          "value": "H/V keystone"
-        },
-        {
-          "code": "02",
-          "value": "Quick Corner"
-        },
-        {
-          "code": "03",
-          "value": "Point Correction"
-        }
-      ],
-      "initSupported": false,
-      "incDecSupported": false,
-      "minMaxSupported": false,
-      "operationPassword": false,
-      "rawDetails": [
-        "01: H/V keystone\n02: Quick Corner\n03: Point Correction"
-      ],
-      "sourceRows": [
-        46,
-        47,
-        48
-      ],
-      "network": true
-    },
-    {
-      "category": "Projection screen adjustment",
       "function": "Setting Aspect ratio",
       "canSet": true,
       "canQuery": true,
@@ -3455,24 +3259,33 @@
   ],
   "sources": [
     {
-      "sourceLabel": "INPUT3\n(DVI/HDMI)",
-      "code": 30,
-      "name": "HDMI1"
+      "sourceGroup": "INPUT3",
+      "type": "direct",
+      "code": "30",
+      "sourceGroupDescription": "DVI/HDMI",
+      "sourceName": "HDMI1"
     },
     {
-      "sourceLabel": "Extended DVI/HDMI",
+      "sourceGroup": "Extended DVI/HDMI",
+      "type": "direct",
       "code": "A0",
-      "name": "HDMI2"
+      "sourceName": "HDMI2"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F0",
-      "name": "For all source"
+      "codeContext": "For all source"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F2",
-      "name": "Video (HDMI1, HDMI2)"
+      "codeContext": "Video",
+      "sourceNames": [
+        "HDMI1",
+        "HDMI2"
+      ]
     }
   ]
 }

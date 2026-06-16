@@ -15,6 +15,11 @@ class ProjectorState:
         self._values: dict[str, str] = {
             name: defn.default for name, defn in model.commands.items()
         }
+        valid_sources = model.non_cyclic_sources()
+        if "SOURCE" in self._values and valid_sources:
+            current = self._values.get("SOURCE", "")
+            if current not in {src.code for src in valid_sources}:
+                self._values["SOURCE"] = valid_sources[0].code
         self._state_observers: list[StateObserver] = []
         self._command_observers: list[CommandObserver] = []
 

@@ -172,21 +172,8 @@
         "x1",
         "x2"
       ],
-      "parameterRanges": [
-        {
-          "min": "01",
-          "max": "1E"
-        }
-      ],
+      "parameterRanges": [],
       "enumValues": [
-        {
-          "code": "00",
-          "value": "Sleep Mode ON"
-        },
-        {
-          "code": "01",
-          "value": "Sleep Mode OFF"
-        },
         {
           "code": "00",
           "value": "Operation, Setting time"
@@ -196,14 +183,12 @@
           "value": "Operation, Setting time, Max setting time"
         }
       ],
-      "initSupported": true,
+      "initSupported": false,
       "incDecSupported": false,
       "minMaxSupported": false,
       "operationPassword": false,
       "rawDetails": [
-        "x1: Operation\n 00: Sleep Mode ON\n 01: Sleep Mode OFF\n INIT\n\nx2: Sleep Mode Timer\n 01-1E (1-30min)",
-        "x1\n 00: Operation, Setting time\n 01: Operation, Setting time, Max setting time",
-        "y1: Setting state\n 00: Sleep Mode ON\n 01: Sleep Mode OFF\n\ny2: Setting Time\n 01-1E (1-30min)\n\ny3: Max setting time\n 01-1E (1-30min)"
+        "x1\n 00: Operation, Setting time\n 01: Operation, Setting time, Max setting time"
       ],
       "sourceRows": [
         19,
@@ -2331,43 +2316,12 @@
         "x2"
       ],
       "parameterRanges": [],
-      "enumValues": [
-        {
-          "code": "01",
-          "value": "Custom1  (L2)"
-        },
-        {
-          "code": "02",
-          "value": "Custom2  (R2)"
-        },
-        {
-          "code": "00",
-          "value": "Color Mode"
-        },
-        {
-          "code": "01",
-          "value": "Lamp consumption"
-        },
-        {
-          "code": "02",
-          "value": "Test Pattern"
-        },
-        {
-          "code": "03",
-          "value": "Network Settings"
-        },
-        {
-          "code": "04",
-          "value": "Eco Settings"
-        }
-      ],
+      "enumValues": [],
       "initSupported": false,
       "incDecSupported": false,
       "minMaxSupported": false,
       "operationPassword": false,
-      "rawDetails": [
-        "x1 = Custom target\n 01: Custom1  (L2)\n 02: Custom2  (R2)\n\nx2 = Function\n 00: Color Mode\n 01: Lamp consumption\n 02: Test Pattern\n 03: Network Settings\n 04: Eco Settings"
-      ],
+      "rawDetails": [],
       "sourceRows": [
         746,
         747,
@@ -2921,44 +2875,53 @@
   ],
   "sources": [
     {
-      "sourceLabel": "INPUT3\n(DVI/HDMI)",
-      "code": 30,
-      "name": "HDMI1"
+      "sourceGroup": "INPUT3",
+      "type": "direct",
+      "code": "30",
+      "sourceGroupDescription": "DVI/HDMI",
+      "sourceName": "HDMI1"
     },
     {
-      "sourceLabel": "EasyMP",
+      "sourceGroup": "EasyMP",
+      "type": "direct",
       "code": "51",
-      "name": "USB Display"
+      "sourceName": "USB Display"
     },
     {
-      "sourceLabel": "EasyMP",
+      "sourceGroup": "EasyMP",
+      "type": "direct",
       "code": "52",
-      "name": "USB"
+      "sourceName": "USB"
     },
     {
-      "sourceLabel": "EasyMP",
+      "sourceGroup": "EasyMP",
+      "type": "direct",
       "code": "53",
-      "name": "LAN"
+      "sourceName": "LAN"
     },
     {
-      "sourceLabel": "Extended DVI/HDMI",
+      "sourceGroup": "Extended DVI/HDMI",
+      "type": "direct",
       "code": "A0",
-      "name": "HDMI2"
+      "sourceName": "HDMI2"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F0",
-      "name": "For all source"
+      "codeContext": "For all source"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F1",
-      "name": "PC"
+      "codeContext": "PC"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F2",
-      "name": "Video"
+      "codeContext": "Video"
     }
   ]
 }

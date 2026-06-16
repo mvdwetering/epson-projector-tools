@@ -129,9 +129,21 @@ def _normalize_value_token(value: object) -> str:
     return str(value).strip().upper()
 
 
-def _is_cyclic_source(source_label: str, name: str) -> bool:
-    text = f"{source_label} {name}".lower()
-    return "change cyclic" in text
+def _source_name_from_item(item: dict, code: str) -> str:
+    value = item.get("sourceName")
+    if isinstance(value, str) and value.strip():
+        return value.strip()
+    return code
+
+
+def _is_cyclic_source_item(item: dict) -> bool:
+    if bool(item.get("cyclic", False)):
+        return True
+    source_type = str(item.get("type", "")).strip().lower()
+    if source_type == "cyclic":
+        return True
+    source_group = str(item.get("sourceGroup", "")).strip().lower()
+    return source_group == "change cyclic"
 
 
 def _is_decimal_range(min_raw: str, max_raw: str) -> bool:
@@ -168,14 +180,13 @@ def _build_sources(data: dict) -> list[SourceDef]:
         if code_raw is None:
             continue
         code = _normalize_value_token(code_raw)
-        name = str(item.get("name", "")).strip() or code
-        source_label = str(item.get("sourceLabel", "")).strip()
+        name = _source_name_from_item(item, code)
         sources.append(
             SourceDef(
                 code=code,
                 name=name,
-                source_label=source_label,
-                cyclic=_is_cyclic_source(source_label, name),
+                source_label=str(item.get("sourceGroupDescription", "")).strip(),
+                cyclic=_is_cyclic_source_item(item),
             )
         )
     return sources

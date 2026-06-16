@@ -105,6 +105,13 @@ class JsonEngineBehaviorTests(unittest.TestCase):
         )
         self.assertEqual(handle_command(self.state, self.model, "LAMP?"), "LAMP=1234\r:")
 
+    def test_projector_state_normalizes_invalid_source_default(self) -> None:
+        model = load_model(Path(__file__).resolve().parents[1] / "models" / "HC980.json")
+        model.commands["SOURCE"].default = "ZZ"
+        state = ProjectorState(model)
+
+        self.assertIn(state.get("SOURCE"), model.source_codes())
+
 
 if __name__ == "__main__":
     unittest.main()

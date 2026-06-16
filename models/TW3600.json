@@ -1430,73 +1430,102 @@
   ],
   "sources": [
     {
-      "sourceLabel": "INPUT1\n(10 is the \"INPUT1\" button of remote controller)",
-      "code": 10,
-      "name": "3RCA"
+      "sourceGroup": "INPUT1",
+      "type": "direct",
+      "code": "10",
+      "sourceGroupDescription": "10 is the \"INPUT1\" button of remote controller",
+      "sourceName": "3RCA"
     },
     {
-      "sourceLabel": "INPUT1\n(10 is the \"INPUT1\" button of remote controller)",
-      "code": 14,
-      "name": "YCbCr"
+      "sourceGroup": "INPUT1",
+      "type": "direct",
+      "code": "14",
+      "sourceGroupDescription": "10 is the \"INPUT1\" button of remote controller",
+      "sourceName": "YCbCr"
     },
     {
-      "sourceLabel": "INPUT1\n(10 is the \"INPUT1\" button of remote controller)",
-      "code": 15,
-      "name": "YPbPr"
+      "sourceGroup": "INPUT1",
+      "type": "direct",
+      "code": "15",
+      "sourceGroupDescription": "10 is the \"INPUT1\" button of remote controller",
+      "sourceName": "YPbPr"
     },
     {
-      "sourceLabel": "INPUT1\n(10 is the \"INPUT1\" button of remote controller)",
+      "sourceGroup": "INPUT1",
+      "type": "direct",
       "code": "1F",
-      "name": "Auto"
+      "sourceGroupDescription": "10 is the \"INPUT1\" button of remote controller",
+      "sourceName": "Auto"
     },
     {
-      "sourceLabel": "INPUT2\n(20 is the \"INPUT2\" button of remote controller)",
-      "code": 20,
-      "name": "Dsub15"
+      "sourceGroup": "INPUT2",
+      "type": "direct",
+      "code": "20",
+      "sourceGroupDescription": "20 is the \"INPUT2\" button of remote controller",
+      "sourceName": "Dsub15"
     },
     {
-      "sourceLabel": "INPUT2\n(20 is the \"INPUT2\" button of remote controller)",
-      "code": 21,
-      "name": "RGB"
+      "sourceGroup": "INPUT2",
+      "type": "direct",
+      "code": "21",
+      "sourceGroupDescription": "20 is the \"INPUT2\" button of remote controller",
+      "sourceName": "RGB"
     },
     {
-      "sourceLabel": "INPUT3\n(DVI/HDMI)\n(30 is the \"INPUT3\" button of remote controller)",
-      "code": 30,
-      "name": "HDMI1"
+      "sourceGroup": "INPUT3",
+      "type": "direct",
+      "code": "30",
+      "sourceGroupDescription": "DVI/HDMI 30 is the \"INPUT3\" button of remote controller",
+      "sourceName": "HDMI1"
     },
     {
-      "sourceLabel": "VIDEO",
-      "code": 40
+      "sourceGroup": "VIDEO",
+      "type": "direct",
+      "code": "40"
     },
     {
-      "sourceLabel": "VIDEO(RCA)",
-      "code": 41,
-      "name": "Video"
+      "sourceGroup": "VIDEO",
+      "type": "direct",
+      "code": "41",
+      "sourceGroupDescription": "RCA",
+      "sourceName": "Video"
     },
     {
-      "sourceLabel": "VIDEO(S)",
-      "code": 42,
-      "name": "S-Video"
+      "sourceGroup": "VIDEO",
+      "type": "direct",
+      "code": "42",
+      "sourceGroupDescription": "S",
+      "sourceName": "S-Video"
     },
     {
-      "sourceLabel": "DVI/HDMI advanced",
+      "sourceGroup": "DVI/HDMI advanced",
+      "type": "direct",
       "code": "A0",
-      "name": "HDMI2"
+      "sourceName": "HDMI2"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F0",
-      "name": "For all source"
+      "codeContext": "For all source"
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F1",
-      "name": "PC (PC only)"
+      "codeContext": "PC",
+      "sourceNames": [
+        "PC only"
+      ]
     },
     {
-      "sourceLabel": "Change cyclic",
+      "sourceGroup": "Change cyclic",
+      "type": "cyclic",
       "code": "F2",
-      "name": "Video (Except PC)"
+      "codeContext": "Video",
+      "sourceNames": [
+        "Except PC"
+      ]
     }
   ]
 }
