@@ -68,6 +68,9 @@ class ModelDef:
     sources: list[SourceDef] = field(default_factory=list)
     ir_codes: set[str] = field(default_factory=set)
     connectivity: Connectivity = field(default_factory=Connectivity)
+    warmup_seconds: float = 5.0
+    cooldown_seconds: float = 3.0
+    supports_comms_standby: bool = False
 
     @classmethod
     def from_dict(cls, data: dict) -> "ModelDef":
@@ -80,6 +83,10 @@ class ModelDef:
             for cmd_name, cmd_data in data["commands"].items()
         }
         return cls(name=data["name"], commands=commands)
+
+    @property
+    def standby_state(self) -> str:
+        return "04" if self.supports_comms_standby else "00"
 
     def non_cyclic_sources(self) -> list[SourceDef]:
         return [src for src in self.sources if not src.cyclic]
@@ -186,12 +193,34 @@ def _build_ir_codes(data: dict) -> set[str]:
     return codes
 
 
-def _aggregate_commands(data: dict, sources: list[SourceDef], ir_codes: set[str]) -> dict[str, CommandDef]:
+def _parse_execution_times(data: dict) -> tuple[float, float]:
+    """Return (warmup_seconds, cooldown_seconds) parsed from executionTimes."""
+    warmup = 5.0
+    cooldown = 3.0
+    for entry in data.get("executionTimes") or []:
+        if not isinstance(entry, dict):
+            continue
+        item = entry.get("item", "")
+        condition = entry.get("condition", "")
+        time_str = str(entry.get("time", ""))
+        try:
+            seconds = float(time_str.split()[0])
+        except (ValueError, IndexError):
+            continue
+        if item == "PWR ON" and warmup == 5.0:
+            warmup = seconds
+        elif item == "PWR OFF" and "Normal" in condition and cooldown == 3.0:
+            cooldown = seconds
+    return warmup, cooldown
+
+
+def _aggregate_commands(data: dict, sources: list[SourceDef], ir_codes: set[str]) -> tuple[dict[str, CommandDef], bool]:
     rows = data.get("commands")
     if not isinstance(rows, list):
         raise ValueError("Model definition missing 'commands' list")
 
     grouped: dict[str, dict] = {}
+    supports_comms_standby = False
 
     for row in rows:
         if not isinstance(row, dict):
@@ -227,6 +256,12 @@ def _aggregate_commands(data: dict, sources: list[SourceDef], ir_codes: set[str]
             entry["set_values"].add(literal_operand)
             if token == "PWR" and literal_operand in {"ON", "OFF"}:
                 entry["set_map"][literal_operand] = "01" if literal_operand == "ON" else "00"
+
+        # Detect communication standby support from PWR? enum values
+        if token == "PWR" and not can_set and can_query:
+            for ev in row.get("enumValues") or []:
+                if isinstance(ev, dict) and ev.get("code") == "04":
+                    supports_comms_standby = True
 
         placeholders = row.get("parameterPlaceholders") or []
         ranges = row.get("parameterRanges") or []
@@ -282,7 +317,7 @@ def _aggregate_commands(data: dict, sources: list[SourceDef], ir_codes: set[str]
             decimal_single_param=bool(entry["decimal_single_param"]),
         )
 
-    return commands
+    return commands, supports_comms_standby
 
 
 def _generate_model_serial(model_id: str, model_name: str, file_name: str) -> str:
@@ -311,7 +346,8 @@ def _load_json_model(path: Path) -> ModelDef:
 
     sources = _build_sources(data)
     ir_codes = _build_ir_codes(data)
-    commands = _aggregate_commands(data, sources, ir_codes)
+    commands, supports_comms_standby = _aggregate_commands(data, sources, ir_codes)
+    warmup_seconds, cooldown_seconds = _parse_execution_times(data)
 
     model_id = str(model_obj.get("id", "")).strip()
     serial_default = _generate_model_serial(model_id, name.strip(), path.name)
@@ -341,6 +377,9 @@ def _load_json_model(path: Path) -> ModelDef:
             wireless_lan=_as_bool_or_none(connectivity_raw.get("wirelessLan")),
             usb_b=_as_bool_or_none(connectivity_raw.get("usbB")),
         ),
+        warmup_seconds=warmup_seconds,
+        cooldown_seconds=cooldown_seconds,
+        supports_comms_standby=supports_comms_standby,
     )
 
 

@@ -12,6 +12,10 @@ from projector.engine import handle_command
 from projector.model import ModelDef
 from projector.state import ProjectorState
 from transports.base import BaseTransport
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from projector.power import PowerSequencer
 
 logger = logging.getLogger(__name__)
 
@@ -101,12 +105,14 @@ class HttpTransport(BaseTransport):
         host: str = "0.0.0.0",
         port: int = 8080,
         password: PasswordStore | None = None,
+        power_sequencer: "PowerSequencer | None" = None,
     ) -> None:
         self._state = state
         self._model = model
         self._host = host
         self._port = port
         self._password = password
+        self._power_sequencer = power_sequencer
 
     async def start(self) -> None:
         middlewares = [_make_digest_middleware(self._password)] if self._password else []
@@ -129,7 +135,7 @@ class HttpTransport(BaseTransport):
         cmd_str = request.rel_url.query.get("jsoncallback")
         if not cmd_str:
             raise web.HTTPBadRequest(reason="Missing jsoncallback parameter")
-        response = handle_command(self._state, self._model, cmd_str)
+        response = handle_command(self._state, self._model, cmd_str, self._power_sequencer)
         self._state.log_command("http", cmd_str, response)
         reply, is_error = self._parse_json_query_response(response)
         return web.json_response(self._build_json_query_payload(cmd_str, reply, is_error))
@@ -148,7 +154,7 @@ class HttpTransport(BaseTransport):
             self._dispatch_key(value.upper())
         else:
             cmd_str = f"{cmd} {value}"
-            response = handle_command(self._state, self._model, cmd_str)
+            response = handle_command(self._state, self._model, cmd_str, self._power_sequencer)
             self._state.log_command("http", cmd_str, response)
             if response.startswith("ERR"):
                 raise web.HTTPBadRequest(reason=f"Command failed: {cmd_str}")
@@ -190,7 +196,7 @@ class HttpTransport(BaseTransport):
 
     def _exec(self, cmd_str: str) -> None:
         """Run a VP21 command through the engine; raise on ERR."""
-        response = handle_command(self._state, self._model, cmd_str)
+        response = handle_command(self._state, self._model, cmd_str, self._power_sequencer)
         self._state.log_command("http", cmd_str, response)
         if response.startswith("ERR"):
             raise web.HTTPBadRequest(reason=f"Command failed: {cmd_str}")

@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import re
+from typing import TYPE_CHECKING
 
 from projector.model import ModelDef
 from projector.state import ProjectorState
+
+if TYPE_CHECKING:
+    from projector.power import PowerSequencer
 
 # Matches "CMD value" (SET) or "CMD?" (GET)
 _SET_RE = re.compile(r"^(?P<cmd>[A-Za-z0-9]+) (?P<val>.*)$")
@@ -13,7 +17,12 @@ _OK = ":"
 _ERR = "ERR\r:"
 
 
-def handle_command(state: ProjectorState, model: ModelDef, cmd_str: str) -> str:
+def handle_command(
+    state: ProjectorState,
+    model: ModelDef,
+    cmd_str: str,
+    power_sequencer: "PowerSequencer | None" = None,
+) -> str:
     """
     Process a single ESC/VP21 command string and return the response.
 
@@ -37,7 +46,7 @@ def handle_command(state: ProjectorState, model: ModelDef, cmd_str: str) -> str:
     # Try SET
     m = _SET_RE.match(line)
     if m:
-        return _handle_set(state, model, m.group("cmd"), m.group("val"))
+        return _handle_set(state, model, m.group("cmd"), m.group("val"), power_sequencer)
 
     return _ERR
 
@@ -66,7 +75,7 @@ def _handle_get(state: ProjectorState, model: ModelDef, cmd: str) -> str:
     return f"{cmd}={value}\r:"
 
 
-def _handle_set(state: ProjectorState, model: ModelDef, cmd: str, value: str) -> str:
+def _handle_set(state: ProjectorState, model: ModelDef, cmd: str, value: str, power_sequencer: "PowerSequencer | None" = None) -> str:
     cmd_def = model.commands.get(cmd)
     if cmd_def is None or not cmd_def.writable:
         return _ERR
@@ -107,11 +116,21 @@ def _handle_set(state: ProjectorState, model: ModelDef, cmd: str, value: str) ->
     if cmd_def.set_map is not None:
         if value not in cmd_def.set_map:
             return _ERR
-        value = cmd_def.set_map[value]
+        mapped = cmd_def.set_map[value]
     elif cmd_def.set_values is not None:
         if value not in cmd_def.set_values:
             return _ERR
+        mapped = value
+    else:
+        mapped = value
 
-    if not state.set(cmd, value):
+    # Delegate PWR transitions to the sequencer when available
+    if cmd == "PWR" and power_sequencer is not None:
+        if mapped == "01":
+            return _OK if power_sequencer.request_on(state, model) else _ERR
+        if mapped == "00":
+            return _OK if power_sequencer.request_off(state, model) else _ERR
+
+    if not state.set(cmd, mapped):
         return _ERR
     return _OK

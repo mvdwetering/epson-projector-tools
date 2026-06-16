@@ -1,12 +1,5 @@
 ## MODIFIED Requirements
 
-### Requirement: Handle null command acknowledgment
-The engine SHALL treat a plain carriage-return command with no command text as a null command and return `:`.
-
-#### Scenario: Plain carriage-return null command
-- **WHEN** input is a null ESC/VP21 command containing only `\r`
-- **THEN** response is `:`
-
 ### Requirement: Handle SET command
 The engine SHALL update projector state for a writable command and return `:`. For `PWR ON` and `PWR OFF`, the engine SHALL delegate to the `PowerSequencer` when one is provided, rejecting commands that are not valid in the current power state.
 
@@ -45,36 +38,3 @@ The engine SHALL update projector state for a writable command and return `:`. F
 #### Scenario: PWR command without sequencer retains synchronous behaviour
 - **WHEN** `PWR ON` or `PWR OFF` is issued and no `PowerSequencer` is provided to the engine
 - **THEN** state is updated immediately and response is `\r:`
-
-### Requirement: Handle source-list queries from model metadata
-The engine SHALL support source-list query responses using model source metadata.
-
-#### Scenario: SOURCELIST returns model sources
-- **WHEN** `SOURCELIST?` is issued and supported by the active model
-- **THEN** response is `SOURCELIST=<code1> <name1> <code2> <name2> ...\r:` built from non-cyclic model sources
-
-#### Scenario: SOURCELISTA returns model sources
-- **WHEN** `SOURCELISTA?` is issued and supported by the active model
-- **THEN** response is `SOURCELISTA=<code1> <name1> <code2> <name2> ...\r:` built from the same non-cyclic model source list as `SOURCELIST`
-
-### Requirement: Validate SOURCE against model source metadata
-The engine SHALL validate `SOURCE` set operands against the active model source metadata.
-
-#### Scenario: Known source code
-- **WHEN** SET `SOURCE <code>` uses a code present in the non-cyclic model source list
-- **THEN** response is `\r:` and state is updated
-
-#### Scenario: Unknown source code
-- **WHEN** SET `SOURCE <code>` uses a code not present in the non-cyclic model source list
-- **THEN** response is `ERR\r:`
-
-### Requirement: Validate KEY against model IR codes
-The engine SHALL validate `KEY` command operands against the active model IR code list.
-
-#### Scenario: Known IR key code
-- **WHEN** SET `KEY <code>` uses a code present in model `irCodes`
-- **THEN** response is `\r:`
-
-#### Scenario: Unknown IR key code
-- **WHEN** SET `KEY <code>` uses a code not present in model `irCodes`
-- **THEN** response is `ERR\r:`

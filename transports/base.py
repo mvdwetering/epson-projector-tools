@@ -7,6 +7,10 @@ from abc import ABC, abstractmethod
 from projector.engine import handle_command
 from projector.model import ModelDef
 from projector.state import ProjectorState
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from projector.power import PowerSequencer
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +47,7 @@ async def handle_escvp21_stream(
     model: ModelDef,
     transport_name: str,
     read_timeout: float | None = None,
+    power_sequencer: "PowerSequencer | None" = None,
 ) -> None:
     """
     ESC/VP21 command loop shared by serial and ESC/VP.net transports.
@@ -68,7 +73,7 @@ async def handle_escvp21_stream(
                 break
 
             cmd_str = raw.decode("utf-8", errors="replace")
-            response = handle_command(state, model, cmd_str)
+            response = handle_command(state, model, cmd_str, power_sequencer)
             writer.write(response.encode("utf-8"))
             await writer.drain()
             state.log_command(transport_name, cmd_str, response)

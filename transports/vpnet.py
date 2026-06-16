@@ -38,6 +38,7 @@ class VpnetTransport(BaseTransport):
         port: int = 3629,
         password_store: PasswordStore | None = None,
         idle_timeout_seconds: float = _DEFAULT_IDLE_TIMEOUT_SECONDS,
+        power_sequencer: "PowerSequencer | None" = None,
     ) -> None:
         self._state = state
         self._model = model
@@ -45,6 +46,7 @@ class VpnetTransport(BaseTransport):
         self._port = port
         self._password_store = password_store
         self._idle_timeout_seconds = idle_timeout_seconds
+        self._power_sequencer = power_sequencer
 
     async def start(self) -> None:
         server = await asyncio.start_server(
@@ -68,6 +70,7 @@ class VpnetTransport(BaseTransport):
                 self._model,
                 "vpnet",
                 read_timeout=self._idle_timeout_seconds,
+                power_sequencer=self._power_sequencer,
             )
         except (asyncio.IncompleteReadError, ConnectionResetError, OSError):
             logger.debug("vpnet: connection closed during handshake from %s", peer)

@@ -21,6 +21,7 @@ from projector.state import ProjectorState
 if TYPE_CHECKING:
     from transports.base import BaseTransport
     from transports.http import PasswordStore
+    from projector.power import PowerSequencer
 
 
 @dataclass(frozen=True)
@@ -190,6 +191,7 @@ class EmulatorApp(App[None]):
         transports: list["BaseTransport"] | None,
         runtime_config: EmulatorRuntimeConfig,
         password_store: "PasswordStore | None" = None,
+        power_sequencer: "PowerSequencer | None" = None,
     ) -> None:
         super().__init__()
         self._state = state
@@ -199,6 +201,7 @@ class EmulatorApp(App[None]):
         self._transport_tasks: list[asyncio.Task] = []
         self._runtime_config = runtime_config
         self._password_store = password_store
+        self._power_sequencer = power_sequencer
         self._state_queue: asyncio.Queue[tuple[str, str]] = asyncio.Queue()
         self._cmd_queue: asyncio.Queue[tuple[str, str, str]] = asyncio.Queue()
         self._recent_commands: list[str] = []
@@ -264,6 +267,7 @@ class EmulatorApp(App[None]):
                 self._model,
                 host=self._runtime_config.host,
                 port=self._runtime_config.serial_port,
+                power_sequencer=self._power_sequencer,
             ),
             VpnetTransport(
                 self._state,
@@ -271,6 +275,7 @@ class EmulatorApp(App[None]):
                 host=self._runtime_config.host,
                 port=self._runtime_config.vpnet_port,
                 password_store=self._password_store,
+                power_sequencer=self._power_sequencer,
             ),
             HttpTransport(
                 self._state,
@@ -278,6 +283,7 @@ class EmulatorApp(App[None]):
                 host=self._runtime_config.host,
                 port=self._runtime_config.http_port,
                 password=self._password_store,
+                power_sequencer=self._power_sequencer,
             ),
         ]
 
@@ -423,9 +429,19 @@ class EmulatorApp(App[None]):
     # ------------------------------------------------------------------
 
     def action_toggle_power(self) -> None:
-        current = self._state.get("PWR")
-        new_cmd = "PWR ON" if current != "01" else "PWR OFF"
-        handle_command(self._state, self._model, new_cmd)
+        if self._power_sequencer is not None:
+            self._power_sequencer.cancel()
+        current = self._state.get("PWR") or "01"
+        # Cycle: 00/04 → 02 → 01 → 03 → 00/04
+        _cycle: dict[str, str] = {
+            "00": "02",
+            "04": "02",
+            "02": "01",
+            "01": "03",
+            "03": self._model.standby_state,
+        }
+        next_state = _cycle.get(current, "02")
+        self._state.set("PWR", next_state)
 
     def action_toggle_auth(self) -> None:
         if self._password_store is None:
@@ -450,6 +466,8 @@ class EmulatorApp(App[None]):
         from projector.state import ProjectorState
 
         await self._stop_transports()
+        if self._power_sequencer is not None:
+            self._power_sequencer.cancel()
 
         self._model = load_model(model_path)
         self._state = ProjectorState(self._model)

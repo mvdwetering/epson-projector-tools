@@ -14,6 +14,7 @@ from pathlib import Path
 
 from projector.model import load_model
 from projector.state import ProjectorState
+from projector.power import PowerSequencer
 from transports.http import PasswordStore
 from ui.app import EmulatorApp, EmulatorRuntimeConfig
 
@@ -73,6 +74,8 @@ def main() -> None:
     model = load_model(model_path)
     state = ProjectorState(model)
 
+    sequencer = PowerSequencer()
+
     password_store = PasswordStore("emulatorpassword", enabled=args.password)
     runtime_config = EmulatorRuntimeConfig(
         host=args.host,
@@ -88,6 +91,7 @@ def main() -> None:
         transports=None,
         runtime_config=runtime_config,
         password_store=password_store,
+        power_sequencer=sequencer,
     )
     app.run()
 
