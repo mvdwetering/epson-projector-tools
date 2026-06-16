@@ -47,19 +47,39 @@ class VpnetTransport(BaseTransport):
         self._password_store = password_store
         self._idle_timeout_seconds = idle_timeout_seconds
         self._power_sequencer = power_sequencer
+        self._server: asyncio.AbstractServer | None = None
+        self._client_tasks: set[asyncio.Task] = set()
 
     async def start(self) -> None:
-        server = await asyncio.start_server(
+        self._server = await asyncio.start_server(
             self._handle_client, self._host, self._port
         )
         logger.info("ESC/VP.net transport listening on %s:%s", self._host, self._port)
-        async with server:
-            await server.serve_forever()
+        try:
+            await self._server.serve_forever()
+        finally:
+            self._server.close()
+            await self._server.wait_closed()
+            self._server = None
+
+    async def stop(self) -> None:
+        for task in list(self._client_tasks):
+            task.cancel()
+        if self._client_tasks:
+            await asyncio.gather(*self._client_tasks, return_exceptions=True)
+            self._client_tasks.clear()
+        if self._server is not None:
+            self._server.close()
+            await self._server.wait_closed()
+            self._server = None
 
     async def _handle_client(
         self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
     ) -> None:
         peer = writer.get_extra_info("peername", ("?", 0))
+        task = asyncio.current_task()
+        if task:
+            self._client_tasks.add(task)
         try:
             if not await self._handshake(reader, writer):
                 return
@@ -75,6 +95,8 @@ class VpnetTransport(BaseTransport):
         except (asyncio.IncompleteReadError, ConnectionResetError, OSError):
             logger.debug("vpnet: connection closed during handshake from %s", peer)
         finally:
+            if task:
+                self._client_tasks.discard(task)
             try:
                 writer.close()
                 await writer.wait_closed()

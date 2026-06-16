@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
+from textual.coordinate import Coordinate
 from textual.screen import ModalScreen
 from textual.widgets import DataTable, Footer, Header, Input, Label, RichLog
 from textual.containers import Horizontal, Vertical
 
-from projector.engine import handle_command
 from projector.model import ModelDef
 from projector.state import ProjectorState
 
@@ -78,7 +78,7 @@ class ModelSelectScreen(ModalScreen[Path | None]):
         for model_path in self._model_paths:
             table.add_row(model_path.name, key=str(model_path))
         if self._model_paths:
-            table.cursor_coordinate = (0, 0)
+            table.cursor_coordinate = Coordinate(0, 0)
             table.focus()
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
@@ -178,10 +178,10 @@ class EmulatorApp(App[None]):
 
     BINDINGS = [
         Binding("p", "toggle_power", "Toggle Power"),
-        Binding("m", "change_model", "Change Model"),
+        Binding("m", "change_model", "Change Model", priority=True),
         Binding("a", "toggle_auth", "Toggle Auth"),
         Binding("w", "change_password", "Change Password"),
-        Binding("q", "quit", "Quit"),
+        Binding("q", "app.quit", "Quit", priority=True),
     ]
 
     def __init__(
@@ -205,6 +205,7 @@ class EmulatorApp(App[None]):
         self._state_queue: asyncio.Queue[tuple[str, str]] = asyncio.Queue()
         self._cmd_queue: asyncio.Queue[tuple[str, str, str]] = asyncio.Queue()
         self._recent_commands: list[str] = []
+        self._background_tasks: list[asyncio.Task] = []
 
     # ------------------------------------------------------------------
     # Compose
@@ -231,10 +232,17 @@ class EmulatorApp(App[None]):
 
         await self._start_transports()
 
-        asyncio.create_task(self._process_state_updates())
-        asyncio.create_task(self._process_command_updates())
+        self._background_tasks = [
+            asyncio.create_task(self._process_state_updates()),
+            asyncio.create_task(self._process_command_updates()),
+        ]
 
     async def on_unmount(self) -> None:
+        if self._background_tasks:
+            for task in self._background_tasks:
+                task.cancel()
+            await asyncio.gather(*self._background_tasks, return_exceptions=True)
+            self._background_tasks = []
         await self._stop_transports()
 
     def _set_title(self) -> None:
@@ -251,6 +259,8 @@ class EmulatorApp(App[None]):
     async def _stop_transports(self) -> None:
         if not self._transport_tasks:
             return
+        for transport in self._transports:
+            await transport.stop()
         for task in self._transport_tasks:
             task.cancel()
         await asyncio.gather(*self._transport_tasks, return_exceptions=True)
@@ -460,6 +470,9 @@ class EmulatorApp(App[None]):
             asyncio.create_task(self._switch_model(selected))
 
         self.push_screen(ModelSelectScreen(models), on_dismiss)
+
+    def action_quit(self) -> None:
+        self.exit()
 
     async def _switch_model(self, model_path: Path) -> None:
         from projector.model import load_model

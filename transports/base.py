@@ -20,6 +20,9 @@ class BaseTransport(ABC):
     async def start(self) -> None:
         """Start the transport server. Runs indefinitely."""
 
+    async def stop(self) -> None:
+        """Stop the transport server if it is running."""
+
 
 async def read_until_cr(
     reader: asyncio.StreamReader,
@@ -59,6 +62,9 @@ async def handle_escvp21_stream(
         while True:
             try:
                 raw = await read_until_cr(reader, read_timeout=read_timeout)
+            except asyncio.CancelledError:
+                logger.info("%s: client handler cancelled from %s:%s", transport_name, peer[0], peer[1])
+                break
             except asyncio.IncompleteReadError:
                 break
             except asyncio.TimeoutError:

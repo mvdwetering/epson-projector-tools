@@ -228,6 +228,36 @@ class EmulatorAppConfigPanelTests(unittest.IsolatedAsyncioTestCase):
             self.assertNotEqual(app.title, before_title)
             self.assertIn(".json", app.title)
 
+    async def test_stop_transports_calls_transport_cleanup(self) -> None:
+        app = self._make_app(
+            EmulatorRuntimeConfig(
+                host="127.0.0.1",
+                serial_port=12345,
+                vpnet_port=3629,
+                http_port=8080,
+                models_dir=Path(__file__).resolve().parents[1] / "models",
+            )
+        )
+
+        class DummyTransport:
+            def __init__(self) -> None:
+                self.stopped = False
+
+            async def start(self) -> None:
+                await asyncio.sleep(0)
+
+            async def stop(self) -> None:
+                self.stopped = True
+
+        dummy = DummyTransport()
+        app._transports = [dummy]  # type: ignore[assignment]
+        app._transport_tasks = [asyncio.create_task(dummy.start())]
+
+        await app._stop_transports()
+
+        self.assertTrue(dummy.stopped)
+        self.assertEqual(app._transport_tasks, [])
+
 
 if __name__ == "__main__":
     unittest.main()

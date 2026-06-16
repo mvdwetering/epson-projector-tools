@@ -113,19 +113,29 @@ class HttpTransport(BaseTransport):
         self._port = port
         self._password = password
         self._power_sequencer = power_sequencer
+        self._runner: web.AppRunner | None = None
 
     async def start(self) -> None:
         middlewares = [_make_digest_middleware(self._password)] if self._password else []
         app = web.Application(middlewares=middlewares)
         app.router.add_get("/cgi-bin/json_query", self._handle_json_query)
         app.router.add_get("/cgi-bin/directsend", self._handle_directsend)
-        runner = web.AppRunner(app)
-        await runner.setup()
-        site = web.TCPSite(runner, self._host, self._port)
+        self._runner = web.AppRunner(app)
+        await self._runner.setup()
+        site = web.TCPSite(self._runner, self._host, self._port)
         await site.start()
         logger.info("HTTP transport listening on %s:%s", self._host, self._port)
-        # Keep running until cancelled
-        await asyncio.get_event_loop().create_future()
+        try:
+            await asyncio.get_event_loop().create_future()
+        finally:
+            if self._runner is not None:
+                await self._runner.cleanup()
+                self._runner = None
+
+    async def stop(self) -> None:
+        if self._runner is not None:
+            await self._runner.cleanup()
+            self._runner = None
 
     # ------------------------------------------------------------------
     # /cgi-bin/json_query?jsoncallback=CMD?
