@@ -6,6 +6,7 @@ import struct
 from typing import TYPE_CHECKING
 
 from projector.model import ModelDef
+from projector.power import PowerSequencer
 from projector.state import ProjectorState
 from transports.base import BaseTransport, handle_escvp21_stream
 
@@ -38,7 +39,7 @@ class VpnetTransport(BaseTransport):
         port: int = 3629,
         password_store: PasswordStore | None = None,
         idle_timeout_seconds: float = _DEFAULT_IDLE_TIMEOUT_SECONDS,
-        power_sequencer: "PowerSequencer | None" = None,
+        power_sequencer: PowerSequencer | None = None,
     ) -> None:
         self._state = state
         self._model = model

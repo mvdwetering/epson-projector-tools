@@ -45,33 +45,6 @@ The HTTP transport SHALL implement `GET /cgi-bin/directsend` for ESC/VP21 SET co
 - **WHEN** the engine returns an error for the command
 - **THEN** the server raises an exception resulting in HTTP 400 or 500
 
-### Requirement: directsend KEY endpoint
-The HTTP transport SHALL implement IR KEY commands via `GET /cgi-bin/directsend?KEY=<ir_code>`. IR codes with known VP21 equivalents SHALL be translated to state changes. Navigation and menu keys SHALL be passed to the engine as `KEY <code>` (notify_only). Unknown IR codes that cannot be handled SHALL raise an exception.
-
-#### Scenario: Power toggle
-- **WHEN** `GET /cgi-bin/directsend?KEY=3B` is received
-- **THEN** if PWR is `01` it becomes `00`; if `00` it becomes `01`; server returns HTTP 200
-
-#### Scenario: Power OFF
-- **WHEN** `GET /cgi-bin/directsend?KEY=6C` is received
-- **THEN** PWR is set to `00`; server returns HTTP 200
-
-#### Scenario: Mute toggle
-- **WHEN** `GET /cgi-bin/directsend?KEY=3E` is received
-- **THEN** MUTE flips between `ON` and `OFF`; server returns HTTP 200
-
-#### Scenario: Source select via IR key
-- **WHEN** `GET /cgi-bin/directsend?KEY=4D` (HDMI1) is received
-- **THEN** SOURCE is set to `30`; server returns HTTP 200
-
-#### Scenario: Navigation key
-- **WHEN** `GET /cgi-bin/directsend?KEY=3C` (Menu) is received
-- **THEN** the engine processes it as notify_only and the server returns HTTP 200
-
-#### Scenario: Unhandled IR code
-- **WHEN** an IR code with no known mapping and no model KEY command match is received
-- **THEN** the server raises an exception resulting in HTTP 400 or 500
-
 ### Requirement: HTTP transport uses asyncio
 The HTTP server SHALL be implemented using `aiohttp` and SHALL not block the asyncio event loop.
 

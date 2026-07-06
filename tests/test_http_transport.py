@@ -60,5 +60,81 @@ class HttpTransportJsonQueryShapeTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(feature["error"])
 
 
+class HttpTransportDirectsendKeyTests(unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self) -> None:
+        model_path = Path(__file__).resolve().parents[1] / "models" / "TW3200.json"
+        self.model = load_model(model_path)
+        self.state = ProjectorState(self.model)
+        self.transport = HttpTransport(self.state, self.model)
+        self.logged: list[tuple[str, str, str]] = []
+        self.state.add_command_observer(
+            lambda transport, command, response: self.logged.append((transport, command, response))
+        )
+
+        app = web.Application()
+        app.router.add_get("/cgi-bin/directsend", self.transport._handle_directsend)
+        self.server = TestServer(app)
+        self.client = TestClient(self.server)
+        await self.client.start_server()
+
+    async def asyncTearDown(self) -> None:
+        await self.client.close()
+
+    async def test_key_source_mapping_logs_received_key_command(self) -> None:
+        response = await self.client.get(
+            "/cgi-bin/directsend",
+            params={"KEY": "40"},
+        )
+
+        self.assertEqual(response.status, 200)
+        self.assertEqual(self.state.get("SOURCE"), "A0")
+        self.assertIn(("http", "KEY 40", ":"), self.logged)
+
+    async def test_unknown_key_returns_bad_request_and_logs_received_command(self) -> None:
+        response = await self.client.get(
+            "/cgi-bin/directsend",
+            params={"KEY": "ZZ"},
+        )
+
+        self.assertEqual(response.status, 400)
+        self.assertIn(("http", "KEY ZZ", "ERR\r:"), self.logged)
+
+
+class HttpTransportDirectsendVolumeKeyTests(unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self) -> None:
+        model_path = Path(__file__).resolve().parents[1] / "models" / "HC1100.json"
+        self.model = load_model(model_path)
+        self.state = ProjectorState(self.model)
+        self.transport = HttpTransport(self.state, self.model)
+
+        app = web.Application()
+        app.router.add_get("/cgi-bin/directsend", self.transport._handle_directsend)
+        self.server = TestServer(app)
+        self.client = TestClient(self.server)
+        await self.client.start_server()
+
+    async def asyncTearDown(self) -> None:
+        await self.client.close()
+
+    async def test_key_volume_inc_dec(self) -> None:
+        before = int(self.state.get("VOL") or "0")
+
+        response_inc = await self.client.get(
+            "/cgi-bin/directsend",
+            params={"KEY": "56"},
+        )
+        self.assertEqual(response_inc.status, 200)
+        after_inc = int(self.state.get("VOL") or "0")
+        self.assertGreaterEqual(after_inc, before)
+
+        response_dec = await self.client.get(
+            "/cgi-bin/directsend",
+            params={"KEY": "57"},
+        )
+        self.assertEqual(response_dec.status, 200)
+        after_dec = int(self.state.get("VOL") or "0")
+        self.assertLessEqual(after_dec, after_inc)
+
+
 if __name__ == "__main__":
     unittest.main()

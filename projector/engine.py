@@ -16,6 +16,18 @@ _GET_RE = re.compile(r"^(?P<cmd>[A-Za-z0-9]+)\?$")
 _OK = ":"
 _ERR = "ERR\r:"
 
+# Common IR-key mappings applied regardless of ingress transport.
+_KEY_DIRECT_SET: dict[str, tuple[str, str]] = {
+    "A1": ("PWR", "ON"),   # Power ON
+    "6C": ("PWR", "OFF"),   # Power OFF
+    "40": ("SOURCE", "A0"),  # HDMI2
+    "4D": ("SOURCE", "30"),  # HDMI1
+    "44": ("SOURCE", "10"),  # PC
+    "46": ("SOURCE", "40"),  # Video
+    "56": ("VOL", "INC"),    # Volume up
+    "57": ("VOL", "DEC"),    # Volume down
+}
+
 
 def handle_command(
     state: ProjectorState,
@@ -105,8 +117,15 @@ def _handle_set(state: ProjectorState, model: ModelDef, cmd: str, value: str, po
     if cmd == "SOURCE" and value not in model.source_codes():
         return _ERR
 
-    if cmd == "KEY" and value not in model.ir_codes:
-        return _ERR
+    if cmd == "KEY":
+        if value not in model.ir_codes:
+            return _ERR
+
+        # KEY command can trigger side-effect command dispatch shared by all transports.
+        mapped = _map_key_to_command(state, value)
+        if mapped is not None:
+            mapped_cmd, mapped_value = mapped
+            return _handle_set(state, model, mapped_cmd, mapped_value, power_sequencer)
 
     # notify_only commands (e.g. KEY): acknowledge but don't store
     if cmd_def.notify_only:
@@ -134,3 +153,16 @@ def _handle_set(state: ProjectorState, model: ModelDef, cmd: str, value: str, po
     if not state.set(cmd, mapped):
         return _ERR
     return _OK
+
+
+def _map_key_to_command(state: ProjectorState, ir_code: str) -> tuple[str, str] | None:
+    if ir_code == "3B":
+        return ("PWR", "OFF" if state.get("PWR") == "01" else "ON")
+
+    if ir_code == "3E":
+        return ("MUTE", "OFF" if state.get("MUTE") == "ON" else "ON")
+
+    mapped = _KEY_DIRECT_SET.get(ir_code)
+    if mapped is None:
+        return None
+    return mapped

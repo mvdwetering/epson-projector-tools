@@ -28,19 +28,6 @@ class PasswordStore:
         self.enabled = enabled
 
 
-# IR codes → direct VP21 SET command string (TW3200 supported codes)
-_IR_DIRECT: dict[str, str] = {
-    "6C": "PWR OFF",    # Power OFF
-    "40": "SOURCE A0",  # HDMI2
-    "4D": "SOURCE 30",  # HDMI1
-    "44": "SOURCE 10",  # PC
-    "46": "SOURCE 40",  # Video
-}
-
-# IR codes whose VP21 source mapping is unknown — surface as an error
-_IR_UNKNOWN_SOURCE: frozenset[str] = frozenset({"43", "45"})  # Component, S-Video
-
-
 def _make_digest_middleware(store: PasswordStore):
     """Return an aiohttp middleware that enforces HTTP Digest authentication.
 
@@ -160,56 +147,12 @@ class HttpTransport(BaseTransport):
             # null command → connectivity/auth probe; surface as success with no state change
             return web.Response(status=200)
         cmd, value = params[0]
-        if cmd.upper() == "KEY":
-            self._dispatch_key(value.upper())
-        else:
-            cmd_str = f"{cmd} {value}"
-            response = handle_command(self._state, self._model, cmd_str, self._power_sequencer)
-            self._state.log_command("http", cmd_str, response)
-            if response.startswith("ERR"):
-                raise web.HTTPBadRequest(reason=f"Command failed: {cmd_str}")
-        return web.Response(status=200)
-
-    # ------------------------------------------------------------------
-    # IR key dispatch
-    # ------------------------------------------------------------------
-
-    def _dispatch_key(self, ir_code: str) -> None:
-        if ir_code in _IR_UNKNOWN_SOURCE:
-            raise web.HTTPBadRequest(
-                reason=f"Unknown VP21 source mapping for IR code {ir_code}"
-            )
-
-        # Power toggle
-        if ir_code == "3B":
-            cmd = "PWR OFF" if self._state.get("PWR") == "01" else "PWR ON"
-            self._exec(cmd)
-            return
-
-        # Mute toggle
-        if ir_code == "3E":
-            cmd = "MUTE OFF" if self._state.get("MUTE") == "ON" else "MUTE ON"
-            self._exec(cmd)
-            return
-
-        # Direct VP21 mapping
-        if ir_code in _IR_DIRECT:
-            self._exec(_IR_DIRECT[ir_code])
-            return
-
-        # Fallback: pass to engine as KEY <code> (notify_only for nav/menu keys)
-        cmd_str = f"KEY {ir_code}"
-        response = handle_command(self._state, self._model, cmd_str)
-        self._state.log_command("http", cmd_str, response)
-        if response.startswith("ERR"):
-            raise web.HTTPBadRequest(reason=f"Unhandled IR key code: {ir_code}")
-
-    def _exec(self, cmd_str: str) -> None:
-        """Run a VP21 command through the engine; raise on ERR."""
+        cmd_str = f"{cmd} {value}"
         response = handle_command(self._state, self._model, cmd_str, self._power_sequencer)
         self._state.log_command("http", cmd_str, response)
         if response.startswith("ERR"):
             raise web.HTTPBadRequest(reason=f"Command failed: {cmd_str}")
+        return web.Response(status=200)
 
     # ------------------------------------------------------------------
     # Helpers

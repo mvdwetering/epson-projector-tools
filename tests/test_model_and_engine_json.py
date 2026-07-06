@@ -112,6 +112,26 @@ class JsonEngineBehaviorTests(unittest.TestCase):
 
         self.assertIn(state.get("SOURCE"), model.source_codes())
 
+    def test_key_source_shortcut_updates_source_value(self) -> None:
+        model = load_model(Path(__file__).resolve().parents[1] / "models" / "TW3200.json")
+        state = ProjectorState(model)
+
+        self.assertEqual(handle_command(state, model, "KEY 40"), ":")
+        self.assertEqual(state.get("SOURCE"), "A0")
+
+    def test_key_volume_shortcuts_apply_inc_dec(self) -> None:
+        model = load_model(Path(__file__).resolve().parents[1] / "models" / "HC1100.json")
+        state = ProjectorState(model)
+        before = int(state.get("VOL") or "0")
+
+        self.assertEqual(handle_command(state, model, "KEY 56"), ":")
+        after_inc = int(state.get("VOL") or "0")
+        self.assertGreaterEqual(after_inc, before)
+
+        self.assertEqual(handle_command(state, model, "KEY 57"), ":")
+        after_dec = int(state.get("VOL") or "0")
+        self.assertLessEqual(after_dec, after_inc)
+
 
 if __name__ == "__main__":
     unittest.main()
